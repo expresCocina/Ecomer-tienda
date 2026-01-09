@@ -1,0 +1,58 @@
+# Dependencias
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Producción
+dist/
+build/
+
+# Variables de entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel
+
+# Supabase local
+.supabase/
+
+# Scripts SQL temporales
+*.sql
+!schema.sql
+!create_reviews_table.sql
+
+# Archivos de configuración local
+facebook-catalog-integration/04_supabase_secrets_example.env
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Misc
+*.log
+.temp/
