@@ -59,7 +59,9 @@ function App() {
           <Route path="/checkout/success" element={<OrderSuccess />} />
           <Route path="/contacto" element={<Contact />} />
           <Route path="/terminos-condiciones" element={<Terms />} />
+          <Route path="/terminos" element={<Terms />} /> {/* Alias para Facebook */}
           <Route path="/politica-privacidad" element={<Privacy />} />
+          <Route path="/privacidad" element={<Privacy />} /> {/* Alias para Facebook */}
           <Route path="/politica-envios" element={<Shipping />} />
           <Route path="/preguntas-frecuentes" element={<FAQ />} />
 
