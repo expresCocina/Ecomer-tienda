@@ -123,22 +123,20 @@ export const Navbar = () => {
                         className="flex items-center space-x-3 group transition-transform hover:scale-105 duration-300"
                         onClick={closeMobileMenu}
                     >
-                        {settings?.logo_url ? (
-                            <img
-                                src={settings.logo_url}
-                                alt={settings.business_name}
-                                className="h-12 md:h-14 w-auto max-w-[220px] object-contain transition-all group-hover:brightness-110"
-                            />
-                        ) : (
-                            <>
-                                <div className="w-12 h-12 bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/30 group-hover:shadow-xl group-hover:shadow-primary-500/40 transition-all duration-300">
-                                    <ShoppingCart className="w-7 h-7 text-white" />
-                                </div>
-                                <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-                                    {settings?.business_name || 'MARKETPLACE'}
-                                </span>
-                            </>
-                        )}
+                        {/* Icon con gradiente */}
+                        <div className="w-11 h-11 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-xl group-hover:shadow-blue-500/50 transition-all duration-300 group-hover:rotate-6">
+                            <ShoppingCart className="w-6 h-6 text-white" />
+                        </div>
+
+                        {/* Texto del logo con gradiente */}
+                        <div className="flex flex-col -space-y-1">
+                            <span className="text-2xl md:text-3xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
+                                AMC
+                            </span>
+                            <span className="text-xs md:text-sm font-bold text-gray-600 tracking-widest uppercase">
+                                Market
+                            </span>
+                        </div>
                     </Link>
 
                     {/* Desktop Navigation */}

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, ShoppingCart } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 
 /**
@@ -20,15 +20,20 @@ export const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* Columna 1: Sobre Nosotros */}
                     <div>
-                        {settings?.logo_url ? (
-                            <img
-                                src={settings.logo_url}
-                                alt={settings.business_name}
-                                className="h-10 md:h-12 w-auto max-w-[180px] object-contain mb-4"
-                            />
-                        ) : (
-                            <h3 className="text-white font-bold text-lg mb-4">{settings?.business_name || 'Mi Tienda'}</h3>
-                        )}
+                        {/* Logo moderno con texto y gradiente */}
+                        <div className="flex items-center space-x-2 mb-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                                <ShoppingCart className="w-5 h-5 text-white" />
+                            </div>
+                            <div className="flex flex-col -space-y-1">
+                                <span className="text-2xl font-black bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                                    AMC
+                                </span>
+                                <span className="text-xs font-bold text-gray-400 tracking-widest uppercase">
+                                    Market
+                                </span>
+                            </div>
+                        </div>
                         <p className="text-sm mb-4">
                             {settings?.business_description || 'Tu tienda de confianza para encontrar los mejores productos al mejor precio.'}
                         </p>
