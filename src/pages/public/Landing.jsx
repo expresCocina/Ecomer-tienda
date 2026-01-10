@@ -91,10 +91,10 @@ export const Landing = () => {
                                     <div
                                         key={product.id}
                                         className={`absolute inset-0 transition-all duration-700 ease-in-out ${index === currentSlide
-                                                ? 'opacity-100 translate-x-0 scale-100'
-                                                : index < currentSlide
-                                                    ? 'opacity-0 -translate-x-full scale-95'
-                                                    : 'opacity-0 translate-x-full scale-95'
+                                            ? 'opacity-100 translate-x-0 scale-100'
+                                            : index < currentSlide
+                                                ? 'opacity-0 -translate-x-full scale-95'
+                                                : 'opacity-0 translate-x-full scale-95'
                                             }`}
                                     >
                                         <div className="bg-white rounded-3xl p-6 lg:p-8 shadow-2xl h-full flex flex-col">
@@ -143,8 +143,8 @@ export const Landing = () => {
                                             key={index}
                                             onClick={() => setCurrentSlide(index)}
                                             className={`h-2 rounded-full transition-all ${index === currentSlide
-                                                    ? 'bg-white w-8'
-                                                    : 'bg-white/40 hover:bg-white/60 w-2'
+                                                ? 'bg-white w-8'
+                                                : 'bg-white/40 hover:bg-white/60 w-2'
                                                 }`}
                                         />
                                     ))}
@@ -167,12 +167,12 @@ export const Landing = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
                                 Productos Destacados
                             </h2>
                             <p className="text-gray-600">Los más populares de nuestra tienda</p>
                         </div>
-                        <Link to="/tienda">
+                        <Link to="/tienda" className="hidden sm:block">
                             <Button variant="ghost">
                                 Ver todos
                                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -185,27 +185,49 @@ export const Landing = () => {
                             <Spinner size="lg" />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {featuredProducts.map((product) => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
+                        <div className="relative group">
+                            {/* Carrusel horizontal */}
+                            <div className="overflow-x-auto scrollbar-hide snap-x snap-mandatory flex gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+                                {featuredProducts.map((product) => (
+                                    <div
+                                        key={product.id}
+                                        className="flex-shrink-0 w-[280px] sm:w-[300px] snap-start"
+                                    >
+                                        <ProductCard product={product} />
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Gradient overlays para indicar scroll */}
+                            <div className="hidden sm:block absolute top-0 left-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent pointer-events-none"></div>
+                            <div className="hidden sm:block absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
                         </div>
                     )}
+
+                    {/* Link "Ver todos" para móvil */}
+                    <div className="sm:hidden mt-6 text-center">
+                        <Link to="/tienda">
+                            <Button variant="outline" className="w-full">
+                                Ver todos los productos
+                                <ArrowRight className="ml-2 w-4 h-4" />
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </section>
 
             {/* Ofertas Especiales */}
-            <section className="py-16 bg-gray-50">
+            <section className="py-16 bg-gradient-to-br from-red-50 to-orange-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-                                <Tag className="w-8 h-8 text-red-500 mr-3" />
+                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 flex items-center">
+                                <Tag className="w-8 h-8 md:w-10 md:h-10 text-red-500 mr-3" />
                                 Ofertas Especiales
                             </h2>
                             <p className="text-gray-600">¡No te pierdas estas increíbles ofertas!</p>
                         </div>
-                        <Link to="/ofertas">
+                        <Link to="/ofertas" className="hidden sm:block">
                             <Button variant="ghost">
                                 Ver todas
                                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -218,12 +240,34 @@ export const Landing = () => {
                             <Spinner size="lg" />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {specialOffers.map((product) => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
+                        <div className="relative group">
+                            {/* Carrusel horizontal */}
+                            <div className="overflow-x-auto scrollbar-hide snap-x snap-mandatory flex gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+                                {specialOffers.map((product) => (
+                                    <div
+                                        key={product.id}
+                                        className="flex-shrink-0 w-[280px] sm:w-[300px] snap-start"
+                                    >
+                                        <ProductCard product={product} />
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Gradient overlays para indicar scroll */}
+                            <div className="hidden sm:block absolute top-0 left-0 bottom-0 w-12 bg-gradient-to-r from-red-50 to-transparent pointer-events-none"></div>
+                            <div className="hidden sm:block absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-orange-50 to-transparent pointer-events-none"></div>
                         </div>
                     )}
+
+                    {/* Link "Ver todas" para móvil */}
+                    <div className="sm:hidden mt-6 text-center">
+                        <Link to="/ofertas">
+                            <Button variant="outline" className="w-full">
+                                Ver todas las ofertas
+                                <ArrowRight className="ml-2 w-4 h-4" />
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </section>
 

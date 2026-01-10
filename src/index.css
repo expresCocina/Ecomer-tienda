@@ -66,6 +66,21 @@
   .text-shadow-glow {
     text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
   }
+
+  /* Ocultar scrollbar pero mantener funcionalidad */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Scroll suave */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
 }
 
 @keyframes progress {
