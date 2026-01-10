@@ -375,13 +375,13 @@ export const ProductDetail = () => {
 
                 {/* Productos Relacionados */}
                 {relatedProducts.length > 0 && (
-                    <section className="py-16 bg-gray-50">
+                    <section className="py-16 bg-gradient-to-br from-blue-50 to-indigo-50">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="mb-8">
-                                <h2 className="text-3xl font-bold text-gradient-primary text-center animate-scale-in">
+                            <div className="mb-8 text-center">
+                                <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
                                     También te puede interesar
                                 </h2>
-                                <p className="text-center text-gray-600 mt-2">
+                                <p className="text-gray-600">
                                     Productos similares que podrían gustarte
                                 </p>
                             </div>
@@ -391,10 +391,22 @@ export const ProductDetail = () => {
                                     <Spinner size="lg" />
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {relatedProducts.map((relatedProduct) => (
-                                        <ProductCard key={relatedProduct.id} product={relatedProduct} />
-                                    ))}
+                                <div className="relative group">
+                                    {/* Carrusel horizontal */}
+                                    <div className="overflow-x-auto scrollbar-hide snap-x snap-mandatory flex gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+                                        {relatedProducts.map((relatedProduct) => (
+                                            <div
+                                                key={relatedProduct.id}
+                                                className="flex-shrink-0 w-[280px] sm:w-[300px] snap-start"
+                                            >
+                                                <ProductCard product={relatedProduct} />
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Gradient overlays para indicar scroll */}
+                                    <div className="hidden sm:block absolute top-0 left-0 bottom-0 w-12 bg-gradient-to-r from-blue-50 to-transparent pointer-events-none"></div>
+                                    <div className="hidden sm:block absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-indigo-50 to-transparent pointer-events-none"></div>
                                 </div>
                             )}
                         </div>
