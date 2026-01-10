@@ -264,16 +264,18 @@ export const Navbar = () => {
 
                 {/* Mobile Search Bar */}
                 <div className="md:hidden pb-4 pt-1">
-                    <div className="relative">
+                    <form onSubmit={handleSearch} className="relative">
                         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Buscar productos..."
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={handleSearchChange}
+                            onKeyPress={handleSearchKeyPress}
+                            onFocus={() => searchQuery && setShowSearchResults(true)}
                             className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 focus:bg-white transition-all duration-300"
                         />
-                    </div>
+                    </form>
                 </div>
             </div>
 
