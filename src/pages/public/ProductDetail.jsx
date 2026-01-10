@@ -26,6 +26,7 @@ export const ProductDetail = () => {
     const [calculatingShipping, setCalculatingShipping] = useState(true);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
+    const [showStickyBar, setShowStickyBar] = useState(false);
     const { addItem, openCart } = useCartStore();
 
     useEffect(() => {
@@ -38,6 +39,20 @@ export const ProductDetail = () => {
 
         return () => clearTimeout(timer);
     }, [id]);
+
+    // Efecto para mostrar/ocultar barra sticky en móvil
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 300) {
+                setShowStickyBar(true);
+            } else {
+                setShowStickyBar(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const detectUserCity = async () => {
         try {
@@ -413,6 +428,52 @@ export const ProductDetail = () => {
                     </section>
                 )}
             </div>
+
+            {/* Barra Sticky Flotante para Móvil */}
+            {product && inStock && (
+                <div
+                    className={`md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 shadow-2xl transition-transform duration-300 z-50 ${showStickyBar ? 'translate-y-0' : 'translate-y-full'
+                        }`}
+                >
+                    <div className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                            {/* Precio compacto */}
+                            <div className="flex-shrink-0">
+                                <p className="text-xs text-gray-500">Precio</p>
+                                <p className="text-lg font-bold text-primary-600">
+                                    {formatPrice(finalPrice)}
+                                </p>
+                            </div>
+
+                            {/* Selector de cantidad compacto */}
+                            <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                                <button
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    className="w-7 h-7 flex items-center justify-center bg-white rounded-md text-gray-600 hover:bg-gray-100 active:scale-95 transition-all shadow-sm"
+                                >
+                                    <span className="text-lg font-semibold">−</span>
+                                </button>
+                                <span className="w-8 text-center font-semibold text-gray-900">{quantity}</span>
+                                <button
+                                    onClick={() => setQuantity(Math.min(Math.min(product.stock, 99), quantity + 1))}
+                                    className="w-7 h-7 flex items-center justify-center bg-white rounded-md text-gray-600 hover:bg-gray-100 active:scale-95 transition-all shadow-sm"
+                                >
+                                    <span className="text-lg font-semibold">+</span>
+                                </button>
+                            </div>
+
+                            {/* Botón agregar al carrito */}
+                            <button
+                                onClick={handleAddToCart}
+                                className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 px-4 rounded-xl font-semibold hover:from-primary-700 hover:to-primary-800 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2"
+                            >
+                                <ShoppingCart className="w-5 h-5" />
+                                <span className="text-sm">Agregar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
