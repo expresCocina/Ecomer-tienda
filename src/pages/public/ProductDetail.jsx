@@ -323,47 +323,47 @@ export const ProductDetail = () => {
                             )}
 
                             {/* Compartir en Redes Sociales */}
-                            <div className="border-t border-gray-200 pt-4">
-                                <p className="text-sm font-medium text-gray-700 mb-3 text-center">
-                                    Compartir en redes sociales
-                                </p>
-                                <div className="flex gap-3 justify-center">
-                                    {/* WhatsApp */}
-                                    <button
-                                        onClick={() => {
-                                            const url = window.location.href;
-                                            const text = `¡Mira este producto! ${product.name} - ${formatPrice(finalPrice)}`;
-                                            window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
-                                        }}
-                                        className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors shadow-sm"
-                                    >
-                                        <MessageCircle className="w-5 h-5" />
-                                        <span className="text-sm font-medium">WhatsApp</span>
-                                    </button>
+                            <div className="border-t border-gray-200 pt-4 mt-4">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xs text-gray-500 font-medium">Compartir:</span>
+                                    <div className="flex gap-2">
+                                        {/* WhatsApp */}
+                                        <button
+                                            onClick={() => {
+                                                const url = window.location.href;
+                                                const text = `¡Mira este producto! ${product.name} - ${formatPrice(finalPrice)}`;
+                                                window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+                                            }}
+                                            className="flex items-center justify-center w-9 h-9 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-all duration-300 hover:scale-110 shadow-sm hover:shadow-md"
+                                            title="Compartir en WhatsApp"
+                                        >
+                                            <MessageCircle className="w-4 h-4" />
+                                        </button>
 
-                                    {/* Facebook */}
-                                    <button
-                                        onClick={() => {
-                                            const url = window.location.href;
-                                            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
-                                        }}
-                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm"
-                                    >
-                                        <Facebook className="w-5 h-5" />
-                                        <span className="text-sm font-medium">Facebook</span>
-                                    </button>
+                                        {/* Facebook */}
+                                        <button
+                                            onClick={() => {
+                                                const url = window.location.href;
+                                                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+                                            }}
+                                            className="flex items-center justify-center w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 hover:scale-110 shadow-sm hover:shadow-md"
+                                            title="Compartir en Facebook"
+                                        >
+                                            <Facebook className="w-4 h-4" />
+                                        </button>
 
-                                    {/* Instagram - Copiar link */}
-                                    <button
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(window.location.href);
-                                            alert('¡Link copiado! Pégalo en Instagram');
-                                        }}
-                                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-colors shadow-sm"
-                                    >
-                                        <Instagram className="w-5 h-5" />
-                                        <span className="text-sm font-medium">Instagram</span>
-                                    </button>
+                                        {/* Instagram - Copiar link */}
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(window.location.href);
+                                                alert('¡Link copiado! Pégalo en Instagram');
+                                            }}
+                                            className="flex items-center justify-center w-9 h-9 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-all duration-300 hover:scale-110 shadow-sm hover:shadow-md"
+                                            title="Copiar link para Instagram"
+                                        >
+                                            <Instagram className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
