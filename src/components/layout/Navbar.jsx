@@ -263,7 +263,7 @@ export const Navbar = () => {
                 </div>
 
                 {/* Mobile Search Bar */}
-                <div className="md:hidden pb-4 pt-1">
+                <div className="md:hidden pb-4 pt-1" ref={searchRef}>
                     <form onSubmit={handleSearch} className="relative">
                         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
@@ -275,6 +275,55 @@ export const Navbar = () => {
                             onFocus={() => searchQuery && setShowSearchResults(true)}
                             className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 focus:bg-white transition-all duration-300"
                         />
+
+                        {/* Dropdown de resultados para móvil */}
+                        {showSearchResults && searchResults.length > 0 && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl max-h-96 overflow-y-auto z-50">
+                                {searchResults.map((product) => (
+                                    <Link
+                                        key={product.id}
+                                        to={`/producto/${product.id}`}
+                                        onClick={() => {
+                                            setSearchQuery('');
+                                            setShowSearchResults(false);
+                                            closeMobileMenu();
+                                        }}
+                                        className="flex items-center gap-4 p-4 hover:bg-gradient-to-r hover:from-primary-50 hover:to-transparent transition-all duration-200 border-b border-gray-50 last:border-0 group"
+                                    >
+                                        <div className="w-14 h-14 bg-gray-100 rounded-xl flex-shrink-0 overflow-hidden ring-2 ring-gray-100 group-hover:ring-primary-200 transition-all">
+                                            {product.images?.[0] ? (
+                                                <img
+                                                    src={product.images[0]}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                    <ShoppingCart className="w-6 h-6" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-primary-700 transition-colors">{product.name}</p>
+                                            <p className="text-base text-primary-600 font-bold mt-0.5">
+                                                {formatPrice(product.offer_price || product.price)}
+                                            </p>
+                                        </div>
+                                    </Link>
+                                ))}
+                                <Link
+                                    to={`/tienda?search=${encodeURIComponent(searchQuery)}`}
+                                    onClick={() => {
+                                        setSearchQuery('');
+                                        setShowSearchResults(false);
+                                        closeMobileMenu();
+                                    }}
+                                    className="block p-4 text-center text-sm text-primary-600 hover:bg-primary-50 font-semibold rounded-b-2xl transition-all"
+                                >
+                                    Ver todos los resultados →
+                                </Link>
+                            </div>
+                        )}
                     </form>
                 </div>
             </div>
