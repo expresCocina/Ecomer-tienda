@@ -107,21 +107,21 @@ export const ReviewSection = ({ productId }) => {
     return (
         <div className="max-w-4xl mx-auto py-12 px-4">
             {/* Header con estadísticas */}
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <MessageCircle className="w-8 h-8 text-primary-600" />
-                    Reseñas de Clientes
-                </h2>
+            <div className="mb-10">
+                <div className="flex items-center gap-3 mb-4">
+                    <MessageCircle className="w-6 h-6 text-primary-600" />
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                        Reseñas de Clientes
+                    </h2>
+                </div>
                 {reviews.length > 0 && (
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <StarRating rating={averageRating} size="lg" />
-                            <span className="text-2xl font-bold text-gray-900">
-                                {averageRating.toFixed(1)}
-                            </span>
-                        </div>
-                        <span className="text-gray-600">
-                            Basado en {reviews.length} {reviews.length === 1 ? 'reseña' : 'reseñas'}
+                    <div className="flex items-center gap-3 pl-9">
+                        <StarRating rating={averageRating} size="md" />
+                        <span className="text-lg font-semibold text-gray-900">
+                            {averageRating.toFixed(1)}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                            · {reviews.length} {reviews.length === 1 ? 'reseña' : 'reseñas'}
                         </span>
                     </div>
                 )}
@@ -132,33 +132,29 @@ export const ReviewSection = ({ productId }) => {
                 {loading ? (
                     <p className="text-center text-gray-500">Cargando reseñas...</p>
                 ) : reviews.length === 0 ? (
-                    <Card>
-                        <CardBody>
-                            <p className="text-center text-gray-500 py-8">
-                                Sé el primero en dejar una reseña para este producto
-                            </p>
-                        </CardBody>
-                    </Card>
+                    <div className="text-center py-12 px-6 bg-gray-50 rounded-xl border border-gray-200">
+                        <p className="text-sm text-gray-500">
+                            Sé el primero en dejar una reseña para este producto
+                        </p>
+                    </div>
                 ) : (
                     reviews.map((review) => (
-                        <Card key={review.id}>
-                            <CardBody>
-                                <div className="flex items-start justify-between mb-3">
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">{review.customer_name}</h3>
-                                        <p className="text-sm text-gray-500">
-                                            {new Date(review.created_at).toLocaleDateString('es-ES', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                            })}
-                                        </p>
-                                    </div>
-                                    <StarRating rating={review.rating} />
+                        <div key={review.id} className="py-6 px-5 bg-white border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+                            <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-gray-900 text-base">{review.customer_name}</h3>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {new Date(review.created_at).toLocaleDateString('es-ES', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                        })}
+                                    </p>
                                 </div>
-                                <p className="text-gray-700 leading-relaxed">{review.comment}</p>
-                            </CardBody>
-                        </Card>
+                                <StarRating rating={review.rating} size="sm" />
+                            </div>
+                            <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
+                        </div>
                     ))
                 )}
             </div>
@@ -166,16 +162,14 @@ export const ReviewSection = ({ productId }) => {
             {/* Formulario para nueva reseña */}
             <div>
                 {!showForm ? (
-                    <Button
+                    <button
                         onClick={() => setShowForm(true)}
-                        variant="outline"
-                        size="lg"
-                        className="w-full group"
+                        className="w-full py-4 px-6 bg-white border-2 border-primary-200 text-primary-600 rounded-xl font-medium hover:bg-primary-50 hover:border-primary-300 transition-all flex items-center justify-center gap-2 group"
                     >
-                        <Send className="w-5 h-5 mr-2 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         Escribir una Reseña
-                        <ChevronDown className="w-5 h-5 ml-2" />
-                    </Button>
+                        <ChevronDown className="w-4 h-4" />
+                    </button>
                 ) : (
                     <Card className="animate-slide-up">
                         <CardBody>
