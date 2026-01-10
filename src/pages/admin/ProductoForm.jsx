@@ -167,33 +167,6 @@ export const ProductoForm = () => {
                 savedProductId = data.id;
             }
 
-            // Sincronizar con Facebook Catalog
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                const response = await fetch(
-                    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-facebook-catalog`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${session?.access_token}`
-                        },
-                        body: JSON.stringify({
-                            type: isEditing ? 'UPDATE' : 'INSERT',
-                            record: { id: savedProductId, ...productData }
-                        })
-                    }
-                );
-
-                if (response.ok) {
-                    console.log('✅ Producto sincronizado con Facebook');
-                } else {
-                    console.warn('⚠️ Error sincronizando con Facebook:', await response.text());
-                }
-            } catch (fbError) {
-                console.error('Error Facebook sync:', fbError);
-                // No bloquear el guardado por error de Facebook
-            }
 
             alert(isEditing ? 'Producto actualizado correctamente' : 'Producto creado correctamente');
             navigate('/admin/inventario');
