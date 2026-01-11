@@ -7,8 +7,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AMC MARKET - Tienda Online</title>
 
-  <!-- Meta Pixel Code -->
+  <!-- Facebook Parameter Generator + Meta Pixel Code -->
   <script>
+    // Facebook Parameter Generator - Captura fbclid y genera cookies FBC/FBP
+    (function () {
+      // Generar _fbp cookie si no existe
+      if (!document.cookie.match(/_fbp=/)) {
+        var fbp = 'fb.1.' + Date.now() + '.' + Math.random().toString(36).substring(2);
+        document.cookie = '_fbp=' + fbp + ';path=/;max-age=7776000'; // 90 días
+      }
+
+      // Capturar fbclid de la URL y generar _fbc cookie
+      var fbclid = new URLSearchParams(window.location.search).get('fbclid');
+      if (fbclid) {
+        var fbc = 'fb.1.' + Date.now() + '.' + fbclid;
+        document.cookie = '_fbc=' + fbc + ';path=/;max-age=7776000'; // 90 días
+      }
+    })();
+
+    // Meta Pixel Code
     !function (f, b, e, v, n, t, s) {
       if (f.fbq) return; n = f.fbq = function () {
         n.callMethod ?
