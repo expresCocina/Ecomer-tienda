@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Package, CheckCircle } from 'lucide-react';
 import { useCartStore, selectSubtotal } from '../../store/cartStore';
@@ -9,6 +9,8 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardBody } from '../../components/ui/Card';
+import { trackInitiateCheckout } from '../../lib/fbPixel';
+import { capiInitiateCheckout } from '../../lib/fbCapi';
 
 /**
  * Página de Checkout
@@ -26,6 +28,14 @@ export const Checkout = () => {
         customer_address: '',
         notes: '',
     });
+
+    // Track InitiateCheckout event when page loads
+    useEffect(() => {
+        if (items.length > 0) {
+            const eventId = trackInitiateCheckout(items, subtotal);
+            capiInitiateCheckout(items, subtotal, eventId);
+        }
+    }, []);
 
     // Redirigir si el carrito está vacío
     if (items.length === 0) {

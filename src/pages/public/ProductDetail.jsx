@@ -13,6 +13,8 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Spinner } from '../../components/ui/Spinner';
 import { Card, CardBody } from '../../components/ui/Card';
+import { trackViewContent } from '../../lib/fbPixel';
+import { capiViewContent } from '../../lib/fbCapi';
 
 /**
  * Página de detalle de producto
@@ -103,6 +105,12 @@ export const ProductDetail = () => {
             setLoading(true);
             const data = await getProductById(id);
             setProduct(data);
+
+            // Track ViewContent event (Pixel + CAPI)
+            if (data) {
+                const eventId = trackViewContent(data);
+                capiViewContent(data, eventId);
+            }
 
             // Cargar productos relacionados
             if (data?.category_id) {

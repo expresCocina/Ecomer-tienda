@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { trackAddToCart } from '../lib/fbPixel';
+import { capiAddToCart } from '../lib/fbCapi';
 
 /**
  * Store del carrito de compras con persistencia en localStorage
@@ -18,6 +20,10 @@ export const useCartStore = create(
              * Si ya existe, incrementa la cantidad
              */
             addItem: (product, quantity = 1) => {
+                // Track AddToCart event (Pixel + CAPI)
+                const eventId = trackAddToCart(product, quantity);
+                capiAddToCart(product, quantity, eventId);
+
                 set((state) => {
                     const existingItem = state.items.find((item) => item.id === product.id);
 
