@@ -1,114 +1,85 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Package, ShoppingCart, DollarSign, LogOut, Settings, FolderTree } from 'lucide-react';
-import { useAuthStore } from '../../store/authStore';
-import { Button } from '../../components/ui/Button';
+import { useState } from 'react';
+import { LiveUserMap } from '../../components/admin/LiveUserMap';
+import { Users, Globe, Activity } from 'lucide-react';
 
 /**
- * Dashboard principal del panel administrativo
+ * Página del dashboard - Panel principal del administrador
  */
 export const Dashboard = () => {
-    const navigate = useNavigate();
-    const { user, signOut } = useAuthStore();
-
-    const handleSignOut = async () => {
-        await signOut();
-        navigate('/admin/login');
-    };
-
-    const menuItems = [
-        {
-            title: 'Inventario',
-            description: 'Gestiona productos y stock',
-            icon: Package,
-            path: '/admin/inventario',
-            color: 'bg-blue-500',
-        },
-        {
-            title: 'Pedidos',
-            description: 'Ver y gestionar pedidos',
-            icon: ShoppingCart,
-            path: '/admin/pedidos',
-            color: 'bg-green-500',
-        },
-        {
-            title: 'Finanzas',
-            description: 'Ingresos y ganancias',
-            icon: DollarSign,
-            path: '/admin/finanzas',
-            color: 'bg-purple-500',
-        },
-        {
-            title: 'Categorías',
-            description: 'Gestionar categorías',
-            icon: FolderTree,
-            path: '/admin/categorias',
-            color: 'bg-orange-500',
-        },
-        {
-            title: 'Configuración',
-            description: 'Ajustes del negocio',
-            icon: Settings,
-            path: '/admin/configuracion',
-            color: 'bg-gray-500',
-        },
-    ];
-
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <header className="bg-white shadow-sm border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Panel Administrativo</h1>
-                            <p className="text-sm text-gray-600 mt-1">Bienvenido, {user?.email}</p>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                        Dashboard
+                    </h1>
+                    <p className="text-gray-600">
+                        Panel de control y monitoreo en tiempo real
+                    </p>
+                </div>
+
+                {/* Contenido Principal */}
+                <div className="grid grid-cols-1 gap-6">
+                    {/* Sección: Mapa de Usuarios en Vivo */}
+                    <div className="bg-white rounded-2xl shadow-xl p-6">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                                <Globe className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-900">
+                                    Usuarios en Vivo
+                                </h2>
+                                <p className="text-sm text-gray-500">
+                                    Monitoreo geográfico en tiempo real
+                                </p>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <Link to="/">
-                                <Button variant="outline" size="sm">
-                                    Ver Tienda
-                                </Button>
-                            </Link>
-                            <Button onClick={handleSignOut} variant="ghost" size="sm">
-                                <LogOut className="w-4 h-4 mr-2" />
-                                Cerrar Sesión
-                            </Button>
+
+                        {/* Mapa */}
+                        <div className="h-[600px]">
+                            <LiveUserMap />
+                        </div>
+                    </div>
+
+                    {/* Tarjetas Informativas */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                            <div className="flex items-center justify-between mb-4">
+                                <Users className="w-8 h-8 text-blue-600" />
+                                <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                                    ACTIVO
+                                </span>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-1">Visitantes Activos</p>
+                            <p className="text-2xl font-bold text-gray-900">En tiempo real</p>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+                            <div className="flex items-center justify-between mb-4">
+                                <Globe className="w-8 h-8 text-green-600" />
+                                <span className="text-xs font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">
+                                    GLOBAL
+                                </span>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-1">Alcance Global</p>
+                            <p className="text-2xl font-bold text-gray-900">Múltiples países</p>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+                            <div className="flex items-center justify-between mb-4">
+                                <Activity className="w-8 h-8 text-purple-600" />
+                                <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
+                                    LIVE
+                                </span>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-1">Actualización</p>
+                            <p className="text-2xl font-bold text-gray-900">Tiempo real</p>
                         </div>
                     </div>
                 </div>
-            </header>
-
-            {/* Main Content */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-8">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">¿Qué deseas hacer?</h2>
-                    <p className="text-gray-600">Selecciona una opción para comenzar</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {menuItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className="block group"
-                        >
-                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-primary-300 transition-all">
-                                <div className="flex items-start gap-4">
-                                    <div className={`p-3 rounded-lg ${item.color}`}>
-                                        <item.icon className="w-6 h-6 text-white" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-primary-600 transition-colors">
-                                            {item.title}
-                                        </h3>
-                                        <p className="text-sm text-gray-600">{item.description}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            </main>
+            </div>
         </div>
     );
 };
