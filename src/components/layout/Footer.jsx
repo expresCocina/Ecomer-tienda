@@ -137,8 +137,23 @@ export const Footer = () => {
                 </div>
 
                 {/* Separador */}
-                <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-                    <p>&copy; {currentYear} {settings?.business_name || 'Mi Tienda'}. Todos los derechos reservados.</p>
+                <div className="border-t border-gray-800 mt-8 pt-8">
+                    <div className="text-center space-y-3">
+                        <p className="text-sm text-gray-400">
+                            &copy; {currentYear} <span className="font-semibold text-gray-300">AMC MARKET</span>. Todos los derechos reservados.
+                        </p>
+                        <p className="text-xs text-gray-500">
+                            Creado por{' '}
+                            <a
+                                href="https://www.amcagencyweb.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent hover:from-blue-300 hover:to-purple-300 transition-all"
+                            >
+                                Renting AMC Agency
+                            </a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </footer>
