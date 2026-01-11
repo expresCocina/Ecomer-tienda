@@ -1,54 +1,43 @@
 /**
  * Facebook Conversions API Helper
- * Envía eventos al servidor de Facebook para tracking server-side
+ * Envía eventos al servidor de Facebook a través de Supabase Edge Function
  */
 
-const FACEBOOK_PIXEL_ID = '734516679726171';
-const FACEBOOK_ACCESS_TOKEN = 'EAALK7sFGisIBQS6IorZBEaZCauwY7fIzhRJpWJt5uNdH4PGiZCvQg99ZAZAMPxxCXzZCopidrNZCKIppXq2DwZBpihla6BABWZCoxsHRdwukwA1hm5nmbcqnZArBD4BGF38ZBrtyQLrlXG9RyGX6qcrbqZB6FoRjtmnuHsgC0kAwRUjpope3inKfL3NvjUioHIDjNTXmOAZDZD';
+import { supabase } from './supabase';
 
 /**
- * Envía evento a Facebook Conversions API
+ * Envía evento a Facebook Conversions API vía Edge Function
  * @param {string} eventName - Nombre del evento (ViewContent, AddToCart, etc.)
  * @param {Object} eventData - Datos del evento
  * @param {string} eventId - ID único para deduplicación
  */
 export const sendToFacebookCAPI = async (eventName, eventData, eventId) => {
     try {
-        const url = `https://graph.facebook.com/v18.0/${FACEBOOK_PIXEL_ID}/events`;
-
-        const payload = {
-            data: [{
-                event_name: eventName,
-                event_time: Math.floor(Date.now() / 1000),
-                event_id: eventId,
-                event_source_url: window.location.href,
-                action_source: 'website',
-                user_data: {
-                    client_ip_address: await getClientIP(),
-                    client_user_agent: navigator.userAgent,
-                    fbp: getCookie('_fbp'),
-                    fbc: getCookie('_fbc')
-                },
-                custom_data: eventData
-            }],
-            access_token: FACEBOOK_ACCESS_TOKEN
+        // Obtener datos del usuario
+        const userData = {
+            event_source_url: window.location.href,
+            client_ip_address: await getClientIP(),
+            client_user_agent: navigator.userAgent,
+            fbp: getCookie('_fbp'),
+            fbc: getCookie('_fbc')
         };
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+        // Llamar a Edge Function de Supabase
+        const { data, error } = await supabase.functions.invoke('facebook-capi', {
+            body: {
+                eventName,
+                eventData,
+                eventId,
+                userData
+            }
         });
 
-        if (!response.ok) {
-            throw new Error(`CAPI error: ${response.statusText}`);
+        if (error) {
+            throw error;
         }
 
-        const result = await response.json();
-        console.log('✅ CAPI event sent:', eventName, result);
-        return result;
+        console.log('✅ CAPI event sent:', eventName, data);
+        return data;
     } catch (error) {
         console.error('❌ CAPI error:', error);
         // No bloquear la UI si falla CAPI
