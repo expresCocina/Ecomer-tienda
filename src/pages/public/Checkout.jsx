@@ -9,8 +9,8 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardBody } from '../../components/ui/Card';
-import { trackInitiateCheckout } from '../../lib/fbPixel';
-import { capiInitiateCheckout } from '../../lib/fbCapi';
+import { trackInitiateCheckout, trackPurchase } from '../../lib/fbPixel';
+import { capiInitiateCheckout, capiPurchase } from '../../lib/fbCapi';
 
 /**
  * Página de Checkout
@@ -89,7 +89,19 @@ export const Checkout = () => {
                 status: 'pending',
             };
 
-            await createOrder(orderData, items);
+            const order = await createOrder(orderData, items);
+
+            // Track Purchase event (Pixel + CAPI)
+            const purchaseData = {
+                items: items.map(item => ({
+                    product_id: item.id,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                total: subtotal
+            };
+            const eventId = trackPurchase(purchaseData);
+            capiPurchase(purchaseData, eventId);
 
             // Limpiar carrito
             clearCart();
