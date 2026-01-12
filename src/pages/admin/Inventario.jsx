@@ -94,19 +94,19 @@ export const Inventario = () => {
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
             <div className="bg-white shadow-sm border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                             <Package className="w-8 h-8 text-primary-600" />
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">Inventario</h1>
+                                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Inventario</h1>
                                 <p className="text-sm text-gray-600">{filteredProducts.length} productos</p>
                             </div>
                         </div>
-                        <Link to="/admin/inventario/nuevo">
-                            <Button>
+                        <Link to="/admin/inventario/nuevo" className="w-full sm:w-auto">
+                            <Button className="w-full sm:w-auto">
                                 <Plus className="w-5 h-5 mr-2" />
-                                Nuevo Producto
+                                <span>Nuevo Producto</span>
                             </Button>
                         </Link>
                     </div>
