@@ -29,6 +29,7 @@ export const ProductDetail = () => {
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
     const [showStickyBar, setShowStickyBar] = useState(false);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const { addItem, openCart } = useCartStore();
 
     useEffect(() => {
@@ -266,11 +267,21 @@ export const ProductDetail = () => {
                                 <CardBody>
                                     <div className="flex items-start gap-3">
                                         <Info className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
-                                        <div>
+                                        <div className="w-full">
                                             <h3 className="font-semibold text-gray-900 mb-2">Descripción</h3>
-                                            <p className="text-gray-600 whitespace-pre-line">
-                                                {product.description}
-                                            </p>
+                                            <div className="relative">
+                                                <p className={`text-gray-600 whitespace-pre-line transition-all duration-300 ${!isDescriptionExpanded ? 'line-clamp-3' : ''}`}>
+                                                    {product.description}
+                                                </p>
+                                                {product.description.length > 150 && (
+                                                    <button
+                                                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                                                        className="mt-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline focus:outline-none flex items-center transition-colors"
+                                                    >
+                                                        {isDescriptionExpanded ? 'Leer menos' : 'Leer más...'}
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </CardBody>

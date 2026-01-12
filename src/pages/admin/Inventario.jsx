@@ -70,7 +70,7 @@ export const Inventario = () => {
             alert('Producto eliminado correctamente');
         } catch (error) {
             console.error('Error deleting product:', error);
-            alert('Error al eliminar el producto');
+            alert(`Error al eliminar el producto: ${error.message || error}`);
         }
     };
 
