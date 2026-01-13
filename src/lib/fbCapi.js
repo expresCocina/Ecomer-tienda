@@ -33,7 +33,8 @@ export const sendToFacebookCAPI = async (eventName, eventData, eventId) => {
         });
 
         if (error) {
-            throw error;
+            console.error('❌ CAPI error:', error);
+            return null;
         }
 
         console.log('✅ CAPI event sent:', eventName, data);
