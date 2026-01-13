@@ -17,20 +17,25 @@ export const useCartStore = create(
 
             /**
              * Añade un producto al carrito
-             * Si ya existe, incrementa la cantidad
+             * Si ya existe con las mismas variantes, incrementa la cantidad
              */
-            addItem: (product, quantity = 1) => {
+            addItem: (product, quantity = 1, variants = {}) => {
                 // Track AddToCart event (Pixel + CAPI)
                 const eventId = trackAddToCart(product, quantity);
                 capiAddToCart(product, quantity, eventId);
 
                 set((state) => {
-                    const existingItem = state.items.find((item) => item.id === product.id);
+                    // Buscar item existente con las mismas variantes
+                    const existingItem = state.items.find((item) =>
+                        item.id === product.id &&
+                        JSON.stringify(item.variants || {}) === JSON.stringify(variants)
+                    );
 
                     if (existingItem) {
                         return {
                             items: state.items.map((item) =>
-                                item.id === product.id
+                                item.id === product.id &&
+                                    JSON.stringify(item.variants || {}) === JSON.stringify(variants)
                                     ? { ...item, quantity: item.quantity + quantity }
                                     : item
                             ),
@@ -47,6 +52,7 @@ export const useCartStore = create(
                                 image: product.images?.[0] || null,
                                 quantity,
                                 product_id: product.id,
+                                variants, // Guardar variantes seleccionadas
                             },
                         ],
                     };

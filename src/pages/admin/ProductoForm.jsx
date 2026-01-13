@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Card, CardHeader, CardBody } from '../../components/ui/Card';
+import { VariantEditor } from '../../components/admin/VariantEditor';
 import { supabase, uploadProductImage, getProductById } from '../../lib/supabase';
 
 /**
@@ -31,8 +32,8 @@ export const ProductoForm = () => {
         tags: '',
     });
     const [images, setImages] = useState([]);
-
     const [existingImages, setExistingImages] = useState([]);
+    const [variants, setVariants] = useState({});
     const [errors, setErrors] = useState({});
 
     // Cargar categorías y producto si es edición
@@ -68,6 +69,7 @@ export const ProductoForm = () => {
                 tags: product.tags?.join(', ') || '',
             });
             setExistingImages(product.images || []);
+            setVariants(product.variants || {});
         } catch (error) {
             console.error('Error loading product:', error);
             alert('Error al cargar el producto');
@@ -143,6 +145,7 @@ export const ProductoForm = () => {
                 show_in_carousel: formData.show_in_carousel,
                 tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
                 images: allImages,
+                variants: variants, // Agregar variantes
             };
 
             let savedProductId = id;
@@ -369,6 +372,22 @@ export const ProductoForm = () => {
                                         </label>
                                     </div>
                                 </div>
+                            </CardBody>
+                        </Card>
+
+                        {/* Variantes */}
+                        <Card>
+                            <CardHeader>
+                                <h2 className="text-lg font-semibold">Variantes del Producto</h2>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Configura opciones como tallas, colores, materiales, etc.
+                                </p>
+                            </CardHeader>
+                            <CardBody>
+                                <VariantEditor
+                                    variants={variants}
+                                    onChange={setVariants}
+                                />
                             </CardBody>
                         </Card>
 

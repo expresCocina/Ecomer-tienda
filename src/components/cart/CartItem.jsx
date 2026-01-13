@@ -31,6 +31,21 @@ export const CartItem = ({ item }) => {
                 <h3 className="text-sm font-medium text-gray-900 truncate">
                     {item.name}
                 </h3>
+
+                {/* Mostrar variantes si existen */}
+                {item.variants && Object.keys(item.variants).length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                        {Object.entries(item.variants).map(([type, value]) => (
+                            <span
+                                key={type}
+                                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700"
+                            >
+                                {value}
+                            </span>
+                        ))}
+                    </div>
+                )}
+
                 <p className="text-sm text-primary-600 font-semibold mt-1">
                     {formatPrice(item.price)}
                 </p>

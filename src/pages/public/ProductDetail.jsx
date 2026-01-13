@@ -6,6 +6,7 @@ import { formatPrice, calculateDiscount } from '../../lib/utils';
 import { useCartStore } from '../../store/cartStore';
 import { ImageGallery } from '../../components/shop/ImageGallery';
 import { QuantitySelector } from '../../components/shop/QuantitySelector';
+import { VariantSelector } from '../../components/shop/VariantSelector';
 import { ProductCard } from '../../components/shop/ProductCard';
 import { ReviewSection } from '../../components/reviews/ReviewSection';
 import { StarRating } from '../../components/ui/StarRating';
@@ -30,6 +31,7 @@ export const ProductDetail = () => {
     const [loadingRelated, setLoadingRelated] = useState(false);
     const [showStickyBar, setShowStickyBar] = useState(false);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    const [selectedVariants, setSelectedVariants] = useState({});
     const { addItem, openCart } = useCartStore();
 
     useEffect(() => {
@@ -137,7 +139,18 @@ export const ProductDetail = () => {
     };
 
     const handleAddToCart = () => {
-        addItem(product, quantity);
+        // Validar si el producto tiene variantes y si están seleccionadas
+        if (product.variants && Object.keys(product.variants).length > 0) {
+            const requiredVariants = Object.keys(product.variants);
+            const missingVariants = requiredVariants.filter(type => !selectedVariants[type]);
+
+            if (missingVariants.length > 0) {
+                alert(`Por favor selecciona: ${missingVariants.join(', ')}`);
+                return;
+            }
+        }
+
+        addItem(product, quantity, selectedVariants);
         openCart();
     };
 
@@ -298,6 +311,17 @@ export const ProductDetail = () => {
                                         </Badge>
                                     ))}
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Selector de Variantes */}
+                        {product.variants && Object.keys(product.variants).length > 0 && (
+                            <div className="mb-6">
+                                <VariantSelector
+                                    variants={product.variants}
+                                    selected={selectedVariants}
+                                    onChange={setSelectedVariants}
+                                />
                             </div>
                         )}
 
