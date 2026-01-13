@@ -141,11 +141,32 @@ export const ProductDetail = () => {
     const handleAddToCart = () => {
         // Validar si el producto tiene variantes y si están seleccionadas
         if (product.variants && Object.keys(product.variants).length > 0) {
+            // Mapear tipos de variantes (plural) a claves de selección (singular)
+            const variantTypeMap = {
+                'sizes': 'size',
+                'colors': 'color',
+                'materials': 'material',
+                'styles': 'style'
+            };
+
             const requiredVariants = Object.keys(product.variants);
-            const missingVariants = requiredVariants.filter(type => !selectedVariants[type]);
+            const missingVariants = requiredVariants.filter(type => {
+                const selectionKey = variantTypeMap[type] || type;
+                return !selectedVariants[selectionKey];
+            });
 
             if (missingVariants.length > 0) {
-                alert(`Por favor selecciona: ${missingVariants.join(', ')}`);
+                // Convertir nombres técnicos a nombres amigables
+                const friendlyNames = missingVariants.map(type => {
+                    const names = {
+                        'sizes': 'talla',
+                        'colors': 'color',
+                        'materials': 'material',
+                        'styles': 'estilo'
+                    };
+                    return names[type] || type;
+                });
+                alert(`Por favor selecciona: ${friendlyNames.join(', ')}`);
                 return;
             }
         }
