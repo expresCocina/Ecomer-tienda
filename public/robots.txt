@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+
+# Sitemap
+Sitemap: https://ecomer-tienda.vercel.app/sitemap.xml

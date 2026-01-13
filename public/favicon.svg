@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6366F1;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Shopping cart icon -->
+  <path d="M20 25 L30 25 L40 75 L80 75" stroke="url(#grad)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="45" cy="85" r="5" fill="url(#grad)"/>
+  <circle cx="75" cy="85" r="5" fill="url(#grad)"/>
+  
+  <!-- AMC text -->
+  <text x="50" y="50" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="url(#grad)" text-anchor="middle">AMC</text>
+</svg>
