@@ -34,6 +34,22 @@ serve(async (req) => {
 
         console.log(`🔄 Sincronizando producto: ${record.name} (${record.id})`);
 
+        // Obtener nombre de categoría si existe
+        let categoryName = "Sin categoría";
+        if (record.category_id) {
+            const { data: category } = await supabase
+                .from("categories")
+                .select("name")
+                .eq("id", record.category_id)
+                .single();
+
+            if (category) {
+                categoryName = category.name;
+            }
+        }
+
+        console.log(`📁 Categoría: ${categoryName}`);
+
         // Preparar datos para Facebook
         const data = {
             retailer_id: record.id,
@@ -49,6 +65,9 @@ serve(async (req) => {
             image_url: record.images?.[0] || "",
             url: `${SITE}/producto/${record.id}`,
             brand: record.brand || "Generico",
+            // NUEVO: Agregar categoría para Product Sets
+            product_type: categoryName,
+            google_product_category: record.category_id?.toString() || "0",
         };
 
         // Post a Facebook Graph API
