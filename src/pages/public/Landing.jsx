@@ -83,9 +83,9 @@ export const Landing = () => {
                         {/* Carrusel de Productos */}
                         <div className="relative h-[450px] lg:h-[500px] mt-8 lg:mt-0">
                             {featuredProducts.slice(0, 3).map((product, index) => {
-                                const discount = calculateDiscount(product.price, product.sale_price);
-                                const hasOffer = product.is_offer && product.sale_price < product.price;
-                                const finalPrice = hasOffer ? product.sale_price : product.price;
+                                const discount = calculateDiscount(product.price, product.offer_price);
+                                const hasOffer = product.is_offer && product.offer_price && product.offer_price < product.price;
+                                const finalPrice = hasOffer ? product.offer_price : product.price;
 
                                 return (
                                     <div
