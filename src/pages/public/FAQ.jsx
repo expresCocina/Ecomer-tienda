@@ -118,14 +118,14 @@ export const FAQ = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-20 sm:pt-24 md:pt-28 pb-16">
+        <div className="min-h-screen bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 pt-20 sm:pt-24 md:pt-28 pb-16">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12">
                     <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <HelpCircle className="w-10 h-10 text-white" />
+                        <HelpCircle className="w-10 h-10 text-primary-900" />
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    <h1 className="font-display text-3xl md:text-4xl font-bold text-gold-400 mb-4">
                         Preguntas Frecuentes
                     </h1>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -151,24 +151,24 @@ export const FAQ = () => {
                                 return (
                                     <div
                                         key={faqIndex}
-                                        className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg"
+                                        className="bg-primary-800/50 rounded-xl shadow-md border-2 border-gold-500/20 overflow-hidden transition-all duration-200 hover:shadow-lg"
                                     >
                                         <button
                                             onClick={() => toggleFAQ(globalIndex)}
-                                            className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                                            className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-primary-700/50 border border-gold-500/20 transition-colors"
                                         >
                                             <span className="font-semibold text-gray-900 pr-4">
                                                 {faq.question}
                                             </span>
                                             {isOpen ? (
-                                                <ChevronUp className="w-5 h-5 text-primary-600 flex-shrink-0" />
+                                                <ChevronUp className="w-5 h-5 text-gold-400 flex-shrink-0" />
                                             ) : (
                                                 <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
                                             )}
                                         </button>
                                         {isOpen && (
                                             <div className="px-6 pb-5 pt-2 border-t border-gray-100">
-                                                <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                                                <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
                                             </div>
                                         )}
                                     </div>
@@ -189,24 +189,24 @@ export const FAQ = () => {
                             return (
                                 <div
                                     key={index}
-                                    className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg"
+                                    className="bg-primary-800/50 rounded-xl shadow-md border-2 border-gold-500/20 overflow-hidden transition-all duration-200 hover:shadow-lg"
                                 >
                                     <button
                                         onClick={() => toggleFAQ(globalIndex)}
-                                        className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                                        className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-primary-700/50 border border-gold-500/20 transition-colors"
                                     >
                                         <span className="font-semibold text-gray-900 pr-4">
                                             {faq.question}
                                         </span>
                                         {isOpen ? (
-                                            <ChevronUp className="w-5 h-5 text-primary-600 flex-shrink-0" />
+                                            <ChevronUp className="w-5 h-5 text-gold-400 flex-shrink-0" />
                                         ) : (
                                             <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
                                         )}
                                     </button>
                                     {isOpen && (
                                         <div className="px-6 pb-5 pt-2 border-t border-gray-100">
-                                            <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                                            <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
                                         </div>
                                     )}
                                 </div>
@@ -216,7 +216,7 @@ export const FAQ = () => {
                 </div>
 
                 {/* CTA Final */}
-                <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-xl p-8 text-center text-white">
+                <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-xl p-8 text-center text-primary-900">
                     <h3 className="text-2xl font-bold mb-3">
                         ¿No encontraste lo que buscabas?
                     </h3>
@@ -225,7 +225,7 @@ export const FAQ = () => {
                     </p>
                     <a
                         href="/contacto"
-                        className="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors"
+                        className="inline-block bg-white text-gold-400 px-8 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors"
                     >
                         Contáctanos Ahora
                     </a>

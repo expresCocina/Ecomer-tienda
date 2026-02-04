@@ -21,7 +21,7 @@ export const VariantSelector = ({ variants = {}, selected = {}, onChange }) => {
 
     const renderSizeSelector = (sizes) => (
         <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gold-400">
                 Talla
             </label>
             <div className="flex flex-wrap gap-2">
@@ -35,14 +35,14 @@ export const VariantSelector = ({ variants = {}, selected = {}, onChange }) => {
                                 relative min-w-[3rem] px-4 py-2 rounded-lg font-medium
                                 transition-all duration-200 transform
                                 ${isSelected
-                                    ? 'bg-primary-600 text-white shadow-lg scale-105 ring-2 ring-primary-300'
-                                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-primary-400 hover:scale-105'
+                                    ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 shadow-lg scale-105 ring-2 ring-gold-400'
+                                    : 'bg-primary-800/50 text-gray-300 border-2 border-gold-500/30 hover:border-gold-500/50 hover:scale-105'
                                 }
                             `}
                         >
                             {size}
                             {isSelected && (
-                                <Check className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 text-white rounded-full p-0.5" />
+                                <Check className="absolute -top-1 -right-1 w-4 h-4 bg-gold-500 text-primary-900 rounded-full p-0.5" />
                             )}
                         </button>
                     );
@@ -53,7 +53,7 @@ export const VariantSelector = ({ variants = {}, selected = {}, onChange }) => {
 
     const renderColorSelector = (colors) => (
         <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gold-400">
                 Color
             </label>
             <div className="flex flex-wrap gap-3">
@@ -67,20 +67,20 @@ export const VariantSelector = ({ variants = {}, selected = {}, onChange }) => {
                                 relative px-4 py-2 rounded-lg font-medium
                                 transition-all duration-200 transform
                                 ${isSelected
-                                    ? 'bg-primary-600 text-white shadow-lg scale-105 ring-2 ring-primary-300'
-                                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-primary-400 hover:scale-105'
+                                    ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 shadow-lg scale-105 ring-2 ring-gold-400'
+                                    : 'bg-primary-800/50 text-gray-300 border-2 border-gold-500/30 hover:border-gold-500/50 hover:scale-105'
                                 }
                             `}
                         >
                             <span className="flex items-center gap-2">
                                 <span
-                                    className="w-4 h-4 rounded-full border-2 border-gray-300"
+                                    className="w-4 h-4 rounded-full border-2 border-gold-500/50"
                                     style={{ backgroundColor: getColorHex(color) }}
                                 />
                                 {color}
                             </span>
                             {isSelected && (
-                                <Check className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 text-white rounded-full p-0.5" />
+                                <Check className="absolute -top-1 -right-1 w-4 h-4 bg-gold-500 text-primary-900 rounded-full p-0.5" />
                             )}
                         </button>
                     );
@@ -91,7 +91,7 @@ export const VariantSelector = ({ variants = {}, selected = {}, onChange }) => {
 
     const renderGenericSelector = (type, options) => (
         <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700 capitalize">
+            <label className="block text-sm font-medium text-gold-400 capitalize">
                 {type}
             </label>
             <div className="flex flex-wrap gap-2">
@@ -105,14 +105,14 @@ export const VariantSelector = ({ variants = {}, selected = {}, onChange }) => {
                                 relative px-4 py-2 rounded-lg font-medium
                                 transition-all duration-200 transform
                                 ${isSelected
-                                    ? 'bg-primary-600 text-white shadow-lg scale-105 ring-2 ring-primary-300'
-                                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-primary-400 hover:scale-105'
+                                    ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 shadow-lg scale-105 ring-2 ring-gold-400'
+                                    : 'bg-primary-800/50 text-gray-300 border-2 border-gold-500/30 hover:border-gold-500/50 hover:scale-105'
                                 }
                             `}
                         >
                             {option}
                             {isSelected && (
-                                <Check className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 text-white rounded-full p-0.5" />
+                                <Check className="absolute -top-1 -right-1 w-4 h-4 bg-gold-500 text-primary-900 rounded-full p-0.5" />
                             )}
                         </button>
                     );
@@ -122,7 +122,7 @@ export const VariantSelector = ({ variants = {}, selected = {}, onChange }) => {
     );
 
     return (
-        <div className="space-y-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="space-y-6 p-4 bg-primary-800/50 rounded-lg border-2 border-gold-500/20">
             {variants.sizes && renderSizeSelector(variants.sizes)}
             {variants.colors && renderColorSelector(variants.colors)}
             {Object.entries(variants).map(([type, options]) => {

@@ -49,14 +49,14 @@ export const Contact = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50 pt-20 sm:pt-24 md:pt-28 pb-16">
+        <div className="min-h-screen bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 pt-20 sm:pt-24 md:pt-28 pb-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12 animate-fade-in">
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    <h1 className="font-display text-4xl md:text-5xl font-bold text-gold-400 mb-4">
                         ¿Tienes alguna pregunta?
                     </h1>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-lg text-gray-300 max-w-2xl mx-auto">
                         Estamos aquí para ayudarte. Contáctanos y te responderemos lo antes posible.
                     </p>
                 </div>
@@ -66,14 +66,14 @@ export const Contact = () => {
                     <div className="lg:col-span-1 space-y-6">
                         {/* Email */}
                         {settings?.contact_email && (
-                            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-                                <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                    <Mail className="w-7 h-7 text-white" />
+                            <div className="bg-primary-800/50 rounded-2xl shadow-lg border-2 border-gold-500/20 p-6 hover:shadow-2xl hover:border-gold-500/40 transition-all duration-300 transform hover:-translate-y-1 group">
+                                <div className="w-14 h-14 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-gold-500/20">
+                                    <Mail className="w-7 h-7 text-primary-900" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Email</h3>
+                                <h3 className="text-lg font-semibold text-gold-400 mb-2">Email</h3>
                                 <a
                                     href={`mailto:${settings.contact_email}`}
-                                    className="text-primary-600 hover:text-primary-700 font-medium break-all"
+                                    className="text-gray-300 hover:text-gold-400 font-medium break-all transition-colors"
                                 >
                                     {settings.contact_email}
                                 </a>
@@ -82,14 +82,14 @@ export const Contact = () => {
 
                         {/* Teléfono */}
                         {settings?.contact_phone && (
-                            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-                                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                    <Phone className="w-7 h-7 text-white" />
+                            <div className="bg-primary-800/50 rounded-2xl shadow-lg border-2 border-gold-500/20 p-6 hover:shadow-2xl hover:border-gold-500/40 transition-all duration-300 transform hover:-translate-y-1 group">
+                                <div className="w-14 h-14 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-gold-500/20">
+                                    <Phone className="w-7 h-7 text-primary-900" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Teléfono</h3>
+                                <h3 className="text-lg font-semibold text-gold-400 mb-2">Teléfono</h3>
                                 <a
                                     href={`tel:${settings.contact_phone}`}
-                                    className="text-green-600 hover:text-green-700 font-medium"
+                                    className="text-gray-300 hover:text-gold-400 font-medium transition-colors"
                                 >
                                     {settings.contact_phone}
                                 </a>
@@ -98,12 +98,12 @@ export const Contact = () => {
 
                         {/* Dirección */}
                         {settings?.contact_address && (
-                            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-                                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                    <MapPin className="w-7 h-7 text-white" />
+                            <div className="bg-primary-800/50 rounded-2xl shadow-lg border-2 border-gold-500/20 p-6 hover:shadow-2xl hover:border-gold-500/40 transition-all duration-300 transform hover:-translate-y-1 group">
+                                <div className="w-14 h-14 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-gold-500/20">
+                                    <MapPin className="w-7 h-7 text-primary-900" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Dirección</h3>
-                                <p className="text-gray-600">
+                                <h3 className="text-lg font-semibold text-gold-400 mb-2">Dirección</h3>
+                                <p className="text-gray-300">
                                     {settings.contact_address}
                                 </p>
                             </div>
@@ -112,20 +112,20 @@ export const Contact = () => {
 
                     {/* Formulario de contacto */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                        <div className="bg-primary-800/50 rounded-2xl shadow-xl border-2 border-gold-500/20 p-8 md:p-10">
+                            <h2 className="text-2xl font-bold text-gold-400 mb-6">
                                 Envíanos un mensaje
                             </h2>
 
                             {submitted ? (
                                 <div className="text-center py-12 animate-fade-in">
-                                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-                                        <CheckCircle className="w-12 h-12 text-green-600" />
+                                    <div className="w-20 h-20 bg-gradient-to-br from-gold-500 to-gold-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce shadow-lg shadow-gold-500/30">
+                                        <CheckCircle className="w-12 h-12 text-primary-900" />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                    <h3 className="text-2xl font-bold text-gold-400 mb-2">
                                         ¡Mensaje Enviado!
                                     </h3>
-                                    <p className="text-gray-600">
+                                    <p className="text-gray-300">
                                         Gracias por contactarnos. Te responderemos pronto.
                                     </p>
                                 </div>
@@ -180,7 +180,7 @@ export const Contact = () => {
                                         type="submit"
                                         loading={loading}
                                         disabled={loading}
-                                        className="w-full group"
+                                        className="w-full group bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 hover:from-gold-600 hover:to-gold-700"
                                         size="lg"
                                     >
                                         <Send className="w-5 h-5 mr-2 group-hover:translate-x-1 transition-transform" />
@@ -193,18 +193,18 @@ export const Contact = () => {
                 </div>
 
                 {/* Sección adicional de información */}
-                <div className="mt-16 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-2xl p-8 md:p-12 text-white text-center animate-fade-in">
-                    <h2 className="text-3xl font-bold mb-4">
+                <div className="mt-16 bg-gradient-to-r from-gold-500 to-gold-600 rounded-2xl shadow-2xl p-8 md:p-12 text-center animate-fade-in">
+                    <h2 className="text-3xl font-bold text-primary-900 mb-4">
                         ¿Prefieres hablar directamente?
                     </h2>
-                    <p className="text-lg text-primary-100 mb-8 max-w-2xl mx-auto">
+                    <p className="text-lg text-primary-800 mb-8 max-w-2xl mx-auto">
                         Nuestro equipo está disponible de lunes a viernes de 9:00 AM a 6:00 PM
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
                         {settings?.contact_phone && (
                             <a
                                 href={`tel:${settings.contact_phone}`}
-                                className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors inline-flex items-center gap-2"
+                                className="bg-primary-900 text-gold-400 px-8 py-3 rounded-lg font-semibold hover:bg-primary-800 transition-colors inline-flex items-center gap-2"
                             >
                                 <Phone className="w-5 h-5" />
                                 Llámanos Ahora
@@ -213,7 +213,7 @@ export const Contact = () => {
                         {settings?.contact_email && (
                             <a
                                 href={`mailto:${settings.contact_email}`}
-                                className="bg-primary-800 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-900 transition-colors inline-flex items-center gap-2"
+                                className="bg-white text-primary-900 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center gap-2"
                             >
                                 <Mail className="w-5 h-5" />
                                 Escríbenos

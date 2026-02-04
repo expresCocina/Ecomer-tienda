@@ -78,14 +78,14 @@ export const Catalog = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-20 sm:pt-24 md:pt-28 pb-8">
+        <div className="min-h-screen bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 pt-20 sm:pt-24 md:pt-28 pb-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                    <h1 className="font-display text-4xl font-bold text-gold-400 mb-2">
                         {isOffersPage ? 'Ofertas Especiales' : 'Catálogo de Productos'}
                     </h1>
-                    <p className="text-gray-600">
+                    <p className="text-gray-300">
                         {isOffersPage
                             ? '¡Aprovecha nuestras mejores ofertas con descuentos exclusivos!'
                             : 'Explora nuestra selección de productos'}
@@ -95,13 +95,13 @@ export const Catalog = () => {
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Filtros - Desktop */}
                     <aside className="hidden lg:block w-64 flex-shrink-0">
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-24">
+                        <div className="bg-primary-800/50 rounded-xl shadow-md border-2 border-gold-500/20 p-6 sticky top-24">
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-gray-900">Filtros</h2>
+                                <h2 className="text-lg font-semibold text-gold-400">Filtros</h2>
                                 {(selectedCategory || searchQuery) && (
                                     <button
                                         onClick={clearFilters}
-                                        className="text-sm text-primary-600 hover:text-primary-700"
+                                        className="text-sm text-gold-400 hover:text-gold-300"
                                     >
                                         Limpiar
                                     </button>
@@ -110,13 +110,13 @@ export const Catalog = () => {
 
                             {/* Categorías */}
                             <div className="mb-6">
-                                <h3 className="text-sm font-medium text-gray-900 mb-3">Categorías</h3>
+                                <h3 className="text-sm font-medium text-gold-400 mb-3">Categorías</h3>
                                 <div className="space-y-2">
                                     <button
                                         onClick={() => setSelectedCategory(null)}
                                         className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${!selectedCategory
-                                            ? 'bg-primary-50 text-primary-700 font-medium'
-                                            : 'text-gray-700 hover:bg-gray-100'
+                                            ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 font-medium'
+                                            : 'text-gray-300 hover:bg-primary-700/50'
                                             }`}
                                     >
                                         Todas
@@ -126,8 +126,8 @@ export const Catalog = () => {
                                             key={category.id}
                                             onClick={() => setSelectedCategory(category.id)}
                                             className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${selectedCategory === category.id
-                                                ? 'bg-primary-50 text-primary-700 font-medium'
-                                                : 'text-gray-700 hover:bg-gray-100'
+                                                ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 font-medium'
+                                                : 'text-gray-300 hover:bg-primary-700/50'
                                                 }`}
                                         >
                                             {category.name}
@@ -143,7 +143,7 @@ export const Catalog = () => {
                         <Button
                             onClick={() => setShowFilters(!showFilters)}
                             variant="outline"
-                            className="w-full sm:w-auto"
+                            className="w-full sm:w-auto bg-primary-800/50 border-gold-500/30 text-gold-400 hover:bg-primary-800 hover:border-gold-500"
                         >
                             <Filter className="w-4 h-4 mr-2" />
                             Filtros
@@ -154,7 +154,7 @@ export const Catalog = () => {
                     <div className="flex-1">
                         {/* Resultados */}
                         <div className="mb-6 flex items-center justify-between">
-                            <p className="text-gray-600">
+                            <p className="text-gray-300">
                                 {products.length} {products.length === 1 ? 'producto' : 'productos'}
                             </p>
                         </div>
@@ -165,10 +165,10 @@ export const Catalog = () => {
                             </div>
                         ) : products.length === 0 ? (
                             <div className="text-center py-12">
-                                <p className="text-gray-500 text-lg mb-4">
+                                <p className="text-gray-400 text-lg mb-4">
                                     No se encontraron productos
                                 </p>
-                                <Button onClick={clearFilters}>
+                                <Button onClick={clearFilters} className="bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 hover:from-gold-600 hover:to-gold-700">
                                     Ver todos los productos
                                 </Button>
                             </div>
@@ -190,20 +190,20 @@ export const Catalog = () => {
                         className="fixed inset-0 bg-black bg-opacity-50"
                         onClick={() => setShowFilters(false)}
                     />
-                    <div className="fixed inset-x-0 bottom-0 bg-white rounded-t-2xl p-6 animate-slide-up max-h-[80vh] overflow-y-auto">
+                    <div className="fixed inset-x-0 bottom-0 bg-primary-800 rounded-t-2xl p-6 animate-slide-up max-h-[80vh] overflow-y-auto border-t-2 border-gold-500/20">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold text-gray-900">Filtros</h2>
+                            <h2 className="text-lg font-semibold text-gold-400">Filtros</h2>
                             <button
                                 onClick={() => setShowFilters(false)}
-                                className="p-2 hover:bg-gray-100 rounded-lg"
+                                className="p-2 hover:bg-primary-700 rounded-lg"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-5 h-5 text-gold-400" />
                             </button>
                         </div>
 
                         {/* Categorías móvil */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-gray-900 mb-3">Categorías</h3>
+                            <h3 className="text-sm font-medium text-gold-400 mb-3">Categorías</h3>
                             <div className="space-y-2">
                                 <button
                                     onClick={() => {
@@ -211,8 +211,8 @@ export const Catalog = () => {
                                         setShowFilters(false);
                                     }}
                                     className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${!selectedCategory
-                                        ? 'bg-primary-50 text-primary-700 font-medium'
-                                        : 'text-gray-700 hover:bg-gray-100'
+                                        ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 font-medium'
+                                        : 'text-gray-300 hover:bg-primary-700/50'
                                         }`}
                                 >
                                     Todas
@@ -225,8 +225,8 @@ export const Catalog = () => {
                                             setShowFilters(false);
                                         }}
                                         className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${selectedCategory === category.id
-                                            ? 'bg-primary-50 text-primary-700 font-medium'
-                                            : 'text-gray-700 hover:bg-gray-100'
+                                            ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 font-medium'
+                                            : 'text-gray-300 hover:bg-primary-700/50'
                                             }`}
                                     >
                                         {category.name}
@@ -239,13 +239,13 @@ export const Catalog = () => {
                             <Button
                                 onClick={clearFilters}
                                 variant="outline"
-                                className="flex-1"
+                                className="flex-1 bg-primary-700/50 border-gold-500/30 text-gold-400 hover:bg-primary-700 hover:border-gold-500"
                             >
                                 Limpiar
                             </Button>
                             <Button
                                 onClick={() => setShowFilters(false)}
-                                className="flex-1"
+                                className="flex-1 bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 hover:from-gold-600 hover:to-gold-700"
                             >
                                 Aplicar
                             </Button>

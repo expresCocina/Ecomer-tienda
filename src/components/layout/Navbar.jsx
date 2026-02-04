@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Menu, X, User } from 'lucide-react';
+import { Search, ShoppingCart, Menu, X, User, Watch } from 'lucide-react';
 import { useCartStore, selectTotalItems } from '../../store/cartStore';
 import { useAuthStore, selectUser, selectIsAdmin } from '../../store/authStore';
 import { useSettingsStore } from '../../store/settingsStore';
@@ -111,8 +111,8 @@ export const Navbar = () => {
     return (
         <nav
             className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${isScrolled
-                ? 'bg-white/90 backdrop-blur-xl shadow-lg border-b border-gray-100'
-                : 'bg-white/80 backdrop-blur-md'
+                ? 'bg-primary-900/95 backdrop-blur-xl shadow-2xl border-b border-gold-500/20'
+                : 'bg-primary-900/90 backdrop-blur-md'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -123,18 +123,18 @@ export const Navbar = () => {
                         className="flex items-center space-x-3 group transition-transform hover:scale-105 duration-300"
                         onClick={closeMobileMenu}
                     >
-                        {/* Icon con gradiente */}
-                        <div className="w-11 h-11 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-xl group-hover:shadow-blue-500/50 transition-all duration-300 group-hover:rotate-6">
-                            <ShoppingCart className="w-6 h-6 text-white" />
+                        {/* Icon con gradiente dorado */}
+                        <div className="w-11 h-11 bg-gradient-to-br from-gold-500 via-gold-600 to-gold-700 rounded-xl flex items-center justify-center shadow-lg shadow-gold-500/30 group-hover:shadow-xl group-hover:shadow-gold-500/50 transition-all duration-300 group-hover:rotate-6">
+                            <Watch className="w-6 h-6 text-primary-900" />
                         </div>
 
                         {/* Texto del logo con gradiente */}
-                        <div className="flex flex-col -space-y-1">
-                            <span className="text-2xl md:text-3xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
-                                AMC
+                        <div className="flex flex-col">
+                            <span className="font-display text-2xl md:text-3xl font-black bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 bg-clip-text text-transparent tracking-tight">
+                                C&J
                             </span>
-                            <span className="text-xs md:text-sm font-bold text-gray-600 tracking-widest uppercase">
-                                Market
+                            <span className="text-xs md:text-sm font-bold text-gold-400 tracking-widest uppercase">
+                                Relojería
                             </span>
                         </div>
                     </Link>
@@ -145,10 +145,10 @@ export const Navbar = () => {
                             <Link
                                 key={link.path}
                                 to={link.path}
-                                className="relative px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-all duration-300 group"
+                                className="relative px-4 py-2 text-gold-400 hover:text-gold-300 font-medium transition-all duration-300 group"
                             >
                                 <span className="relative z-10">{link.name}</span>
-                                <span className="absolute inset-0 bg-primary-50 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 ease-out"></span>
+                                <span className="absolute inset-0 bg-gold-500/10 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 ease-out"></span>
                             </Link>
                         ))}
                     </div>
@@ -156,15 +156,15 @@ export const Navbar = () => {
                     {/* Search Bar - Desktop */}
                     <div className="hidden md:flex items-center flex-1 max-w-sm lg:max-w-md mx-6 lg:mx-10" ref={searchRef}>
                         <form onSubmit={handleSearch} className="relative w-full">
-                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 z-10 transition-colors" />
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gold-400 z-10 transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Buscar productos..."
+                                placeholder="Buscar relojes..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
                                 onKeyPress={handleSearchKeyPress}
                                 onFocus={() => searchQuery && setShowSearchResults(true)}
-                                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 focus:bg-white text-sm transition-all duration-300 placeholder:text-gray-400"
+                                className="w-full pl-12 pr-4 py-3 bg-primary-800/50 border border-gold-500/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500 focus:bg-primary-800 text-sm transition-all duration-300 placeholder:text-gold-400/50 text-gold-100"
                             />
 
                             {/* Dropdown de resultados */}
@@ -222,14 +222,14 @@ export const Navbar = () => {
                         {user ? (
                             <Link
                                 to={isAdmin ? '/admin/dashboard' : '/cuenta'}
-                                className="hidden sm:flex items-center justify-center w-10 h-10 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-300 group"
+                                className="hidden sm:flex items-center justify-center w-10 h-10 text-gold-400 hover:text-gold-300 hover:bg-gold-500/10 rounded-xl transition-all duration-300 group"
                             >
                                 <User className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
                             </Link>
                         ) : (
                             <Link
                                 to="/admin/login"
-                                className="hidden sm:flex items-center justify-center w-10 h-10 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-300 group"
+                                className="hidden sm:flex items-center justify-center w-10 h-10 text-gold-400 hover:text-gold-300 hover:bg-gold-500/10 rounded-xl transition-all duration-300 group"
                             >
                                 <User className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
                             </Link>
@@ -238,11 +238,11 @@ export const Navbar = () => {
                         {/* Cart Icon */}
                         <button
                             onClick={openCart}
-                            className="relative flex items-center justify-center w-10 h-10 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-300 group"
+                            className="relative flex items-center justify-center w-10 h-10 text-gold-400 hover:text-gold-300 hover:bg-gold-500/10 rounded-xl transition-all duration-300 group"
                         >
                             <ShoppingCart className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
                             {totalItems > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-gradient-to-br from-red-500 to-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-red-500/50 animate-pulse">
+                                <span className="absolute -top-1 -right-1 bg-gradient-to-br from-gold-500 to-gold-600 text-primary-900 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-gold-500/50 animate-pulse">
                                     {totalItems}
                                 </span>
                             )}

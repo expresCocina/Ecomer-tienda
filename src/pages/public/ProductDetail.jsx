@@ -204,13 +204,13 @@ export const ProductDetail = () => {
     const inStock = product.stock > 0;
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-20 sm:pt-24 md:pt-28 pb-8">
+        <div className="min-h-screen bg-gradient-to-b from-primary-900 to-primary-950 pt-20 sm:pt-24 md:pt-28 pb-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Breadcrumb */}
                 <div className="mb-6">
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+                        className="flex items-center text-gold-400 hover:text-gold-300 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Volver
@@ -228,31 +228,31 @@ export const ProductDetail = () => {
                         {/* Categoría y badges */}
                         <div className="flex items-center gap-2 mb-3">
                             {product.categories && (
-                                <span className="text-sm text-gray-500">
+                                <span className="text-sm text-gold-400 font-semibold uppercase tracking-wider">
                                     {product.categories.name}
                                 </span>
                             )}
                             {hasOffer && (
-                                <Badge variant="offer">
+                                <Badge variant="offer" className="bg-gradient-to-r from-gold-500 to-gold-600 text-primary-900 border-gold-400">
                                     -{discount}% OFF
                                 </Badge>
                             )}
                             {product.is_featured && (
-                                <Badge variant="new">
-                                    Nuevo
+                                <Badge variant="new" className="bg-primary-800 text-gold-400 border-gold-500/30">
+                                    Exclusivo
                                 </Badge>
                             )}
                         </div>
 
                         {/* Nombre */}
-                        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                        <h1 className="font-display text-3xl lg:text-4xl font-bold text-gold-400 mb-4">
                             {product.name}
                         </h1>
 
                         {/* Rating */}
                         <div className="flex items-center gap-2 mb-6">
-                            <StarRating rating={product.rating || 0} size="md" />
-                            <span className="text-sm text-gray-600">
+                            <StarRating rating={product.rating || 0} size="md" className="text-gold-500" />
+                            <span className="text-sm text-gray-400">
                                 ({product.rating || 0} estrellas)
                             </span>
                         </div>
@@ -260,17 +260,17 @@ export const ProductDetail = () => {
                         {/* Precio */}
                         <div className="mb-6">
                             <div className="flex items-baseline gap-3">
-                                <span className="text-4xl font-bold text-primary-600">
+                                <span className="text-4xl font-bold text-gold-500">
                                     {formatPrice(finalPrice)}
                                 </span>
                                 {hasOffer && (
-                                    <span className="text-xl text-gray-400 line-through">
+                                    <span className="text-xl text-gray-500 line-through">
                                         {formatPrice(product.price)}
                                     </span>
                                 )}
                             </div>
                             {hasOffer && (
-                                <p className="text-green-600 font-medium mt-2">
+                                <p className="text-gold-400 font-medium mt-2">
                                     ¡Ahorras {formatPrice(product.price - finalPrice)}!
                                 </p>
                             )}
@@ -279,7 +279,7 @@ export const ProductDetail = () => {
                         {/* Stock */}
                         <div className="mb-6">
                             {inStock ? (
-                                <div className="flex items-center gap-2 text-green-600">
+                                <div className="flex items-center gap-2 text-gold-400">
                                     <Package className="w-5 h-5" />
                                     <span className="font-medium">
                                         {product.stock > 10
@@ -288,7 +288,7 @@ export const ProductDetail = () => {
                                     </span>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-2 text-red-600">
+                                <div className="flex items-center gap-2 text-red-400">
                                     <Package className="w-5 h-5" />
                                     <span className="font-medium">Agotado</span>
                                 </div>
@@ -297,20 +297,20 @@ export const ProductDetail = () => {
 
                         {/* Descripción */}
                         {product.description && (
-                            <Card className="mb-6">
+                            <Card className="mb-6 bg-primary-800/50 border-gold-500/20">
                                 <CardBody>
                                     <div className="flex items-start gap-3">
-                                        <Info className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                                        <Info className="w-5 h-5 text-gold-400 flex-shrink-0 mt-0.5" />
                                         <div className="w-full">
-                                            <h3 className="font-semibold text-gray-900 mb-2">Descripción</h3>
+                                            <h3 className="font-display font-semibold text-gold-400 mb-2">Descripción</h3>
                                             <div className="relative">
-                                                <p className={`text-gray-600 whitespace-pre-line transition-all duration-300 ${!isDescriptionExpanded ? 'line-clamp-3' : ''}`}>
+                                                <p className={`text-gray-300 whitespace-pre-line transition-all duration-300 ${!isDescriptionExpanded ? 'line-clamp-3' : ''}`}>
                                                     {product.description}
                                                 </p>
                                                 {product.description.length > 150 && (
                                                     <button
                                                         onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                                                        className="mt-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline focus:outline-none flex items-center transition-colors"
+                                                        className="mt-2 text-sm font-medium text-gold-400 hover:text-gold-300 hover:underline focus:outline-none flex items-center transition-colors"
                                                     >
                                                         {isDescriptionExpanded ? 'Leer menos' : 'Leer más...'}
                                                     </button>
@@ -349,7 +349,7 @@ export const ProductDetail = () => {
                         {/* Selector de cantidad */}
                         {inStock && (
                             <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-gold-400 mb-2">
                                     Cantidad
                                 </label>
                                 <QuantitySelector
@@ -365,7 +365,7 @@ export const ProductDetail = () => {
                             <Button
                                 onClick={handleAddToCart}
                                 disabled={!inStock}
-                                className="w-full"
+                                className="w-full bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-primary-900 font-bold border-2 border-gold-400"
                                 size="lg"
                             >
                                 <ShoppingCart className="w-5 h-5 mr-2" />
@@ -374,27 +374,27 @@ export const ProductDetail = () => {
 
                             {/* Mensaje de envío */}
                             {calculatingShipping ? (
-                                <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg">
+                                <div className="px-4 py-3 bg-primary-800/50 border-2 border-gold-500/20 rounded-lg">
                                     <div className="flex items-center gap-3 mb-2">
-                                        <MapPin className="w-5 h-5 text-gray-600 animate-pulse" />
-                                        <p className="text-sm font-medium text-gray-700">
+                                        <MapPin className="w-5 h-5 text-gold-400 animate-pulse" />
+                                        <p className="text-sm font-medium text-gray-300">
                                             Calculando envío a tu ciudad...
                                         </p>
                                     </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full animate-progress"></div>
+                                    <div className="w-full bg-primary-900/50 rounded-full h-2 overflow-hidden">
+                                        <div className="h-full bg-gradient-to-r from-gold-500 to-gold-600 rounded-full animate-progress"></div>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg animate-slide-up">
-                                    <div className="flex items-center justify-center w-10 h-10 bg-green-500 rounded-full flex-shrink-0">
-                                        <MapPin className="w-5 h-5 text-white" />
+                                <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-gold-500/20 to-gold-600/20 border-2 border-gold-500/30 rounded-lg animate-slide-up">
+                                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-full flex-shrink-0">
+                                        <MapPin className="w-5 h-5 text-primary-900" />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-sm font-semibold text-green-900">
+                                        <p className="text-sm font-semibold text-gold-400">
                                             🎉 ¡Felicidades! Tienes envío gratis
                                         </p>
-                                        <p className="text-xs text-green-700">
+                                        <p className="text-xs text-gray-400">
                                             Recibe en 2-5 días hábiles
                                         </p>
                                     </div>
@@ -454,14 +454,14 @@ export const ProductDetail = () => {
 
                 {/* Productos Relacionados */}
                 {relatedProducts.length > 0 && (
-                    <section className="py-16 bg-gradient-to-br from-blue-50 to-indigo-50">
+                    <section className="py-16 bg-gradient-to-br from-primary-800 to-primary-900 border-t-2 border-gold-500/20">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="mb-8 text-center">
-                                <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                                <h2 className="font-display text-3xl md:text-4xl font-bold bg-gradient-to-r from-gold-400 to-gold-600 bg-clip-text text-transparent mb-2">
                                     También te puede interesar
                                 </h2>
-                                <p className="text-gray-600">
-                                    Productos similares que podrían gustarte
+                                <p className="text-gray-400">
+                                    Relojes similares que podrían gustarte
                                 </p>
                             </div>
 
@@ -484,8 +484,8 @@ export const ProductDetail = () => {
                                     </div>
 
                                     {/* Gradient overlays para indicar scroll */}
-                                    <div className="hidden sm:block absolute top-0 left-0 bottom-0 w-12 bg-gradient-to-r from-blue-50 to-transparent pointer-events-none"></div>
-                                    <div className="hidden sm:block absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-indigo-50 to-transparent pointer-events-none"></div>
+                                    <div className="hidden sm:block absolute top-0 left-0 bottom-0 w-12 bg-gradient-to-r from-primary-800 to-transparent pointer-events-none"></div>
+                                    <div className="hidden sm:block absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-primary-900 to-transparent pointer-events-none"></div>
                                 </div>
                             )}
                         </div>

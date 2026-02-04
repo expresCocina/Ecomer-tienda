@@ -109,18 +109,18 @@ export const ReviewSection = ({ productId }) => {
             {/* Header con estadísticas */}
             <div className="mb-10">
                 <div className="flex items-center gap-3 mb-4">
-                    <MessageCircle className="w-6 h-6 text-primary-600" />
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                    <MessageCircle className="w-6 h-6 text-gold-400" />
+                    <h2 className="font-display text-2xl md:text-3xl font-bold text-gold-400">
                         Reseñas de Clientes
                     </h2>
                 </div>
                 {reviews.length > 0 && (
                     <div className="flex items-center gap-3 pl-9">
-                        <StarRating rating={averageRating} size="md" />
-                        <span className="text-lg font-semibold text-gray-900">
+                        <StarRating rating={averageRating} size="md" className="text-gold-500" />
+                        <span className="text-lg font-semibold text-gold-400">
                             {averageRating.toFixed(1)}
                         </span>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-400">
                             · {reviews.length} {reviews.length === 1 ? 'reseña' : 'reseñas'}
                         </span>
                     </div>
@@ -130,20 +130,20 @@ export const ReviewSection = ({ productId }) => {
             {/* Lista de reseñas */}
             <div className="space-y-6 mb-12">
                 {loading ? (
-                    <p className="text-center text-gray-500">Cargando reseñas...</p>
+                    <p className="text-center text-gray-400">Cargando reseñas...</p>
                 ) : reviews.length === 0 ? (
-                    <div className="text-center py-12 px-6 bg-gray-50 rounded-xl border border-gray-200">
-                        <p className="text-sm text-gray-500">
+                    <div className="text-center py-12 px-6 bg-primary-800/50 rounded-xl border-2 border-gold-500/20">
+                        <p className="text-sm text-gray-300">
                             Sé el primero en dejar una reseña para este producto
                         </p>
                     </div>
                 ) : (
                     reviews.map((review) => (
-                        <div key={review.id} className="py-6 px-5 bg-white border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+                        <div key={review.id} className="py-6 px-5 bg-primary-800/50 border-2 border-gold-500/20 rounded-xl hover:shadow-lg hover:shadow-gold-500/10 transition-all">
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex-1">
-                                    <h3 className="font-semibold text-gray-900 text-base">{review.customer_name}</h3>
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <h3 className="font-display font-semibold text-gold-400 text-base">{review.customer_name}</h3>
+                                    <p className="text-xs text-gray-400 mt-1">
                                         {new Date(review.created_at).toLocaleDateString('es-ES', {
                                             year: 'numeric',
                                             month: 'long',
@@ -151,9 +151,9 @@ export const ReviewSection = ({ productId }) => {
                                         })}
                                     </p>
                                 </div>
-                                <StarRating rating={review.rating} size="sm" />
+                                <StarRating rating={review.rating} size="sm" className="text-gold-500" />
                             </div>
-                            <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
+                            <p className="text-gray-300 text-sm leading-relaxed">{review.comment}</p>
                         </div>
                     ))
                 )}
@@ -164,20 +164,20 @@ export const ReviewSection = ({ productId }) => {
                 {!showForm ? (
                     <button
                         onClick={() => setShowForm(true)}
-                        className="w-full py-4 px-6 bg-white border-2 border-primary-200 text-primary-600 rounded-xl font-medium hover:bg-primary-50 hover:border-primary-300 transition-all flex items-center justify-center gap-2 group"
+                        className="w-full py-4 px-6 bg-primary-800/50 border-2 border-gold-500/30 text-gold-400 rounded-xl font-medium hover:bg-primary-800 hover:border-gold-500/50 transition-all flex items-center justify-center gap-2 group"
                     >
                         <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         Escribir una Reseña
                         <ChevronDown className="w-4 h-4" />
                     </button>
                 ) : (
-                    <Card className="animate-slide-up">
+                    <Card className="animate-slide-up bg-primary-800/50 border-gold-500/20">
                         <CardBody>
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-xl font-bold text-gray-900">Deja tu Reseña</h3>
+                                <h3 className="font-display text-xl font-bold text-gold-400">Deja tu Reseña</h3>
                                 <button
                                     onClick={() => setShowForm(false)}
-                                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                                    className="text-gray-400 hover:text-gold-400 transition-colors"
                                 >
                                     <ChevronUp className="w-6 h-6" />
                                 </button>
@@ -206,7 +206,7 @@ export const ReviewSection = ({ productId }) => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-gold-400 mb-2">
                                         Calificación
                                     </label>
                                     <StarRating
@@ -214,6 +214,7 @@ export const ReviewSection = ({ productId }) => {
                                         onChange={handleRatingChange}
                                         interactive
                                         size="lg"
+                                        className="text-gold-500"
                                     />
                                 </div>
 
@@ -228,7 +229,7 @@ export const ReviewSection = ({ productId }) => {
                                     required
                                 />
 
-                                <Button type="submit" loading={submitting} disabled={submitting} className="w-full">
+                                <Button type="submit" loading={submitting} disabled={submitting} className="w-full bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-primary-900 font-bold border-2 border-gold-400">
                                     <Send className="w-5 h-5 mr-2" />
                                     {submitting ? 'Enviando...' : 'Enviar Reseña'}
                                 </Button>

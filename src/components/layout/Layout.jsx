@@ -1,5 +1,6 @@
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+import { WhatsAppWidget } from '../ui/WhatsAppWidget';
 import { useLocationTracking } from '../../hooks/useLocationTracking';
 
 /**
@@ -19,6 +20,9 @@ export const Layout = ({ children }) => {
             </main>
 
             <Footer />
+
+            {/* WhatsApp Widget flotante */}
+            <WhatsAppWidget />
         </div>
     );
 };
