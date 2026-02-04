@@ -13,7 +13,7 @@ export const SEO = ({
     type = 'website'
 }) => {
     const location = useLocation();
-    const siteUrl = 'https://ecomer-tienda.vercel.app';
+    const siteUrl = 'https://cycrelojeria.com';
     const currentUrl = `${siteUrl}${location.pathname}`;
 
     useEffect(() => {

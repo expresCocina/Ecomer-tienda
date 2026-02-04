@@ -7,8 +7,8 @@ export const SEOHead = ({
     title = 'AMC Market - Tu tienda online de confianza',
     description = 'Descubre los mejores productos en AMC Market. Envíos a toda Colombia, precios competitivos y atención personalizada.',
     keywords = 'tienda online, ecommerce, compras online, Colombia, productos',
-    image = 'https://ecomer-tienda.vercel.app/og-image.jpg',
-    url = 'https://ecomer-tienda.vercel.app',
+    image = 'https://cycrelojeria.com/og-image.jpg',
+    url = 'https://cycrelojeria.com',
     type = 'website',
     structuredData = null
 }) => {
@@ -61,7 +61,7 @@ export const generateProductSchema = (product) => {
         "sku": product.id,
         "offers": {
             "@type": "Offer",
-            "url": `https://ecomer-tienda.vercel.app/producto/${product.id}`,
+            "url": `https://cycrelojeria.com/producto/${product.id}`,
             "priceCurrency": "COP",
             "price": product.offer_price || product.price,
             "availability": product.stock > 0
@@ -85,8 +85,8 @@ export const generateOrganizationSchema = () => {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "AMC Market",
-        "url": "https://ecomer-tienda.vercel.app",
-        "logo": "https://ecomer-tienda.vercel.app/logo.png",
+        "url": "https://cycrelojeria.com",
+        "logo": "https://cycrelojeria.com/logo.png",
         "contactPoint": {
             "@type": "ContactPoint",
             "contactType": "customer service",
