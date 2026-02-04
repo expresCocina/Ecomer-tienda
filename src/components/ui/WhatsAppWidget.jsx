@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
+import { GTMEvents } from '../../lib/gtm';
 
 /**
  * Widget flotante de WhatsApp con diseño premium
@@ -27,6 +28,9 @@ export const WhatsAppWidget = () => {
 
     const handleWhatsAppClick = () => {
         if (!settings?.contact_phone) return;
+
+        // Enviar evento a GTM
+        GTMEvents.clickWhatsApp();
 
         // Limpiar el número de teléfono (quitar espacios, guiones, etc.)
         const cleanPhone = settings.contact_phone.replace(/\D/g, '');

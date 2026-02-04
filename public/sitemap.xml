@@ -1,27 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Página Principal -->
   <url>
     <loc>https://ecomer-tienda.vercel.app/</loc>
-    <lastmod>2026-01-13</lastmod>
+    <lastmod>2026-02-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Catálogo -->
   <url>
-    <loc>https://ecomer-tienda.vercel.app/tienda</loc>
-    <lastmod>2026-01-13</lastmod>
+    <loc>https://ecomer-tienda.vercel.app/catalogo</loc>
+    <lastmod>2026-02-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
+
+  <!-- Ofertas -->
   <url>
     <loc>https://ecomer-tienda.vercel.app/ofertas</loc>
-    <lastmod>2026-01-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-02-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
+
+  <!-- Contacto -->
   <url>
     <loc>https://ecomer-tienda.vercel.app/contacto</loc>
-    <lastmod>2026-01-13</lastmod>
+    <lastmod>2026-02-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Términos y Condiciones -->
+  <url>
+    <loc>https://ecomer-tienda.vercel.app/terminos-condiciones</loc>
+    <lastmod>2026-02-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Política de Privacidad -->
+  <url>
+    <loc>https://ecomer-tienda.vercel.app/politica-privacidad</loc>
+    <lastmod>2026-02-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Política de Envíos -->
+  <url>
+    <loc>https://ecomer-tienda.vercel.app/politica-envios</loc>
+    <lastmod>2026-02-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Preguntas Frecuentes -->
+  <url>
+    <loc>https://ecomer-tienda.vercel.app/preguntas-frecuentes</loc>
+    <lastmod>2026-02-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+
+  <!-- 
+    NOTA: Para agregar productos individuales, puedes generar dinámicamente
+    entradas como esta para cada producto:
+    
+    <url>
+      <loc>https://ecomer-tienda.vercel.app/productos/[id-producto]</loc>
+      <lastmod>2026-02-04</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+      <image:image>
+        <image:loc>URL_de_imagen_del_producto</image:loc>
+        <image:title>Nombre del producto</image:title>
+      </image:image>
+    </url>
+  -->
+
 </urlset>

@@ -1,7 +1,33 @@
+# robots.txt para C&J Relojería
+# Optimizado para SEO
+
 User-agent: *
 Allow: /
+Allow: /catalogo
+Allow: /productos/
+Allow: /ofertas
+Allow: /contacto
+Allow: /terminos-condiciones
+Allow: /politica-privacidad
+Allow: /politica-envios
+Allow: /preguntas-frecuentes
+
+# Bloquear áreas administrativas (si las hay)
 Disallow: /admin/
-Disallow: /checkout/
+Disallow: /api/
+Disallow: /private/
+
+# Permitir rastreo de recursos
+Allow: /*.css
+Allow: /*.js
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.png
+Allow: /*.svg
+Allow: /*.webp
 
 # Sitemap
 Sitemap: https://ecomer-tienda.vercel.app/sitemap.xml
+
+# Crawl-delay (opcional, para ser amigable con los bots)
+Crawl-delay: 1

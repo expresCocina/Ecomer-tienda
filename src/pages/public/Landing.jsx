@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/Button';
 import { Spinner } from '../../components/ui/Spinner';
 import { InfoBanner } from '../../components/ui/InfoBanner';
 import { TestimonialsSection } from '../../components/testimonials/TestimonialsSection';
+import { SEO } from '../../components/seo/SEO';
 
 /**
  * Página de inicio / Landing
@@ -53,6 +54,13 @@ export const Landing = () => {
 
     return (
         <div className="min-h-screen">
+            {/* SEO Meta Tags */}
+            <SEO
+                title="C&J Relojería - Relojes de Lujo Premium para Hombre en Colombia | Envío Gratis"
+                description="🕐 Descubre la colección más exclusiva de relojes de lujo para hombre en Colombia. ✨ Elegancia premium, calidad garantizada y envío gratis. Compra ahora en C&J Relojería."
+                keywords="relojes de lujo Colombia, relojes premium hombre, relojes elegantes, comprar relojes online, relojería Colombia, relojes suizos, relojes clásicos, relojes deportivos, relojes minimalistas"
+                type="website"
+            />
             {/* Hero Section */}
             <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white overflow-hidden">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
