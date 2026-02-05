@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Upload, X } from 'lucide-react';
+import { ArrowLeft, Upload, X, Package, DollarSign, Image as ImageIcon, Settings, Watch } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
@@ -182,20 +182,30 @@ export const ProductoForm = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white shadow-sm border-b border-gray-200">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+            {/* Header con gradiente dorado */}
+            <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 shadow-lg">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <button
                         onClick={() => navigate('/admin/inventario')}
-                        className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+                        className="flex items-center text-gold-300 hover:text-gold-100 mb-4 transition-colors group"
                     >
-                        <ArrowLeft className="w-5 h-5 mr-2" />
+                        <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
                         Volver al inventario
                     </button>
-                    <h1 className="text-2xl font-bold text-gray-900">
-                        {isEditing ? 'Editar Producto' : 'Nuevo Producto'}
-                    </h1>
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-gradient-to-br from-gold-500 via-gold-600 to-gold-700 rounded-xl flex items-center justify-center shadow-lg shadow-gold-500/30">
+                            <Watch className="w-7 h-7 text-primary-900" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-display font-bold text-white">
+                                {isEditing ? 'Editar Producto' : 'Nuevo Producto'}
+                            </h1>
+                            <p className="text-gold-300 text-sm mt-1">
+                                {isEditing ? 'Actualiza la información del reloj' : 'Agrega un nuevo reloj a tu inventario'}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -206,7 +216,15 @@ export const ProductoForm = () => {
                         {/* Información básica */}
                         <Card>
                             <CardHeader>
-                                <h2 className="text-lg font-semibold">Información Básica</h2>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center">
+                                        <Package className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-semibold text-gray-900">Información Básica</h2>
+                                        <p className="text-sm text-gray-500">Detalles principales del producto</p>
+                                    </div>
+                                </div>
                             </CardHeader>
                             <CardBody>
                                 <div className="space-y-4">
@@ -257,7 +275,15 @@ export const ProductoForm = () => {
                         {/* Precios y stock */}
                         <Card>
                             <CardHeader>
-                                <h2 className="text-lg font-semibold">Precios y Stock</h2>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                                        <DollarSign className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-semibold text-gray-900">Precios y Stock</h2>
+                                        <p className="text-sm text-gray-500">Gestiona precios e inventario</p>
+                                    </div>
+                                </div>
                             </CardHeader>
                             <CardBody>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -303,7 +329,15 @@ export const ProductoForm = () => {
                         {/* Imágenes */}
                         <Card>
                             <CardHeader>
-                                <h2 className="text-lg font-semibold">Imágenes</h2>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                        <ImageIcon className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-semibold text-gray-900">Imágenes</h2>
+                                        <p className="text-sm text-gray-500">Galería del producto</p>
+                                    </div>
+                                </div>
                             </CardHeader>
                             <CardBody>
                                 <div className="space-y-4">
@@ -394,7 +428,15 @@ export const ProductoForm = () => {
                         {/* Opciones */}
                         <Card>
                             <CardHeader>
-                                <h2 className="text-lg font-semibold">Opciones</h2>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                        <Settings className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-semibold text-gray-900">Opciones</h2>
+                                        <p className="text-sm text-gray-500">Configuración adicional</p>
+                                    </div>
+                                </div>
                             </CardHeader>
                             <CardBody>
                                 <div className="space-y-3">
@@ -433,16 +475,22 @@ export const ProductoForm = () => {
                         </Card>
 
                         {/* Botones */}
-                        <div className="flex justify-end gap-4">
+                        <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
                             <Button
                                 type="button"
                                 variant="outline"
                                 onClick={() => navigate('/admin/inventario')}
+                                className="px-6"
                             >
                                 Cancelar
                             </Button>
-                            <Button type="submit" loading={loading} disabled={loading}>
-                                {loading ? 'Guardando...' : isEditing ? 'Actualizar Producto' : 'Crear Producto'}
+                            <Button
+                                type="submit"
+                                loading={loading}
+                                disabled={loading}
+                                className="px-8 bg-gradient-to-r from-gold-500 via-gold-600 to-gold-700 hover:from-gold-600 hover:via-gold-700 hover:to-gold-800 text-primary-900 font-semibold shadow-lg shadow-gold-500/30"
+                            >
+                                {loading ? 'Guardando...' : isEditing ? '✓ Actualizar Producto' : '+ Crear Producto'}
                             </Button>
                         </div>
                     </div>
