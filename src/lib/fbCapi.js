@@ -4,6 +4,7 @@
  */
 
 import { supabase } from './supabase';
+import { getFbc, getFbp } from './fbPixel';
 
 /**
  * Envía evento a Facebook Conversions API vía Edge Function
@@ -13,13 +14,13 @@ import { supabase } from './supabase';
  */
 export const sendToFacebookCAPI = async (eventName, eventData, eventId) => {
     try {
-        // Obtener datos del usuario
+        // Obtener datos del usuario con fbc y fbp
         const userData = {
             event_source_url: window.location.href,
             client_ip_address: await getClientIP(),
             client_user_agent: navigator.userAgent,
-            fbp: getCookie('_fbp'),
-            fbc: getCookie('_fbc')
+            fbp: getFbp(),  // Usar función centralizada
+            fbc: getFbc()   // Usar función centralizada
         };
 
         // Llamar a Edge Function de Supabase
