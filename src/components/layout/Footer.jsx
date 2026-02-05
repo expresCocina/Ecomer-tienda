@@ -4,7 +4,7 @@ import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, Watch } from 'lucide
 import { useSettingsStore } from '../../store/settingsStore';
 
 /**
- * Footer del sitio
+ * Footer del sitio - Optimizado para móvil
  */
 export const Footer = () => {
     const currentYear = new Date().getFullYear();
@@ -16,8 +16,8 @@ export const Footer = () => {
 
     return (
         <footer className="bg-gradient-to-b from-primary-900 to-primary-950 text-gray-300 border-t-2 border-gold-500/20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="container-mobile py-8 sm:py-10 md:py-12">
+                <div className="grid grid-mobile-2 lg:grid-cols-4 gap-6 sm:gap-8">
                     {/* Columna 1: Sobre Nosotros */}
                     <div>
                         {/* Logo C&C con diseño elegante */}
@@ -34,23 +34,23 @@ export const Footer = () => {
                                 </span>
                             </div>
                         </div>
-                        <p className="text-sm mb-4 text-gray-400">
+                        <p className="text-mobile-sm mb-4 text-gray-400 leading-relaxed">
                             Elegancia atemporal y precisión suiza. Especialistas en relojes de lujo para el hombre moderno.
                         </p>
-                        <div className="flex space-x-4">
+                        <div className="flex space-x-4 sm:space-x-5">
                             {settings?.facebook_url && (
-                                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">
-                                    <Facebook className="w-5 h-5" />
+                                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 active:text-gold-300 transition-colors touch-target" aria-label="Facebook">
+                                    <Facebook className="w-6 h-6 sm:w-5 sm:h-5" />
                                 </a>
                             )}
                             {settings?.instagram_url && (
-                                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">
-                                    <Instagram className="w-5 h-5" />
+                                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 active:text-gold-300 transition-colors touch-target" aria-label="Instagram">
+                                    <Instagram className="w-6 h-6 sm:w-5 sm:h-5" />
                                 </a>
                             )}
                             {settings?.twitter_url && (
-                                <a href={settings.twitter_url} target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">
-                                    <Twitter className="w-5 h-5" />
+                                <a href={settings.twitter_url} target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 active:text-gold-300 transition-colors touch-target" aria-label="Twitter">
+                                    <Twitter className="w-6 h-6 sm:w-5 sm:h-5" />
                                 </a>
                             )}
                         </div>
@@ -58,8 +58,8 @@ export const Footer = () => {
 
                     {/* Columna 2: Enlaces Rápidos */}
                     <div>
-                        <h3 className="font-display text-gold-400 font-bold text-lg mb-4">Enlaces Rápidos</h3>
-                        <ul className="space-y-2 text-sm">
+                        <h3 className="font-display text-gold-400 font-bold text-mobile-base mb-3 sm:mb-4">Enlaces Rápidos</h3>
+                        <ul className="space-y-2 sm:space-y-2.5 text-mobile-sm">
                             <li>
                                 <Link to="/" className="hover:text-gold-400 transition-colors">
                                     Inicio

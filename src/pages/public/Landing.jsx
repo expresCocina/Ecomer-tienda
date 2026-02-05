@@ -61,28 +61,28 @@ export const Landing = () => {
                 keywords="relojes de lujo Colombia, relojes premium hombre, relojes elegantes, comprar relojes online, relojería Colombia, relojes suizos, relojes clásicos, relojes deportivos, relojes minimalistas"
                 type="website"
             />
-            {/* Hero Section */}
+            {/* Hero Section - Optimizado para móvil */}
             <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white overflow-hidden">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        {/* Contenido Izquierda */}
-                        <div>
-                            <h1 className="font-display text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up text-shadow-lg">
+                <div className="container-mobile py-16 sm:py-20 md:py-24 lg:py-32">
+                    <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 items-center">
+                        {/* Contenido Izquierda - Responsive */}
+                        <div className="text-center lg:text-left">
+                            <h1 className="font-display text-mobile-3xl font-bold mb-4 sm:mb-6 animate-fade-in-up text-shadow-lg leading-tight">
                                 Elegancia <span className="text-gradient-gold">Atemporal</span> en tu Muñeca
                             </h1>
-                            <p className="text-xl md:text-2xl mb-8 text-gray-300 animate-slide-up">
+                            <p className="text-mobile-lg mb-6 sm:mb-8 text-gray-300 animate-slide-up leading-relaxed">
                                 Descubre nuestra exclusiva colección de relojes para hombre. Precisión, estilo y distinción.
                             </p>
-                            <div className="flex flex-wrap gap-4 animate-slide-up">
-                                <Link to="/tienda">
-                                    <Button size="lg" className="bg-gold-500 hover:bg-gold-600 text-primary-900 font-semibold border-2 border-gold-400">
+                            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 animate-slide-up justify-center lg:justify-start">
+                                <Link to="/tienda" className="w-full sm:w-auto">
+                                    <Button size="lg" className="w-full sm:w-auto btn-mobile bg-gold-500 hover:bg-gold-600 active:bg-gold-700 text-primary-900 font-semibold border-2 border-gold-400 tap-highlight-none">
                                         Ver Colección
-                                        <ArrowRight className="ml-2 w-5 h-5" />
+                                        <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                                     </Button>
                                 </Link>
-                                <Link to="/ofertas">
-                                    <Button size="lg" variant="outline" className="bg-white/10 border-2 border-gold-500 text-gold-400 hover:bg-gold-500/20 hover:text-gold-300">
-                                        <Tag className="mr-2 w-5 h-5" />
+                                <Link to="/ofertas" className="w-full sm:w-auto">
+                                    <Button size="lg" variant="outline" className="w-full sm:w-auto btn-mobile bg-white/10 border-2 border-gold-500 text-gold-400 hover:bg-gold-500/20 hover:text-gold-300 active:bg-gold-500/30 tap-highlight-none">
+                                        <Tag className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
                                         Ofertas Exclusivas
                                     </Button>
                                 </Link>
