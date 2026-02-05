@@ -50,8 +50,16 @@ serve(async (req) => {
 
         console.log(`📁 Categoría: ${categoryName}`);
 
-        // Preparar imágenes adicionales (Facebook soporta hasta 20 imágenes)
-        const additionalImages = record.images?.slice(1, 20) || [];
+        // Filtrar y limpiar imágenes (eliminar vacías y duplicadas)
+        const allImages = (record.images || [])
+            .filter((url: string) => url && url.trim() !== "") // Eliminar vacías
+            .filter((url: string, index: number, self: string[]) => self.indexOf(url) === index); // Eliminar duplicadas
+
+        console.log(`📸 Total de imágenes únicas: ${allImages.length}`);
+
+        // Primera imagen como principal, el resto como adicionales
+        const mainImage = allImages[0] || "";
+        const additionalImages = allImages.slice(1, 20); // Facebook soporta hasta 20 imágenes
 
         // Preparar datos para Facebook
         const data: any = {
@@ -65,7 +73,7 @@ serve(async (req) => {
             // Solución: Multiplicar por 100. 95900 * 100 = 9590000 -> 95900.00
             price: (Math.round(record.price * 100)).toString(),
             currency: "COP",
-            image_url: record.images?.[0] || "",
+            image_url: mainImage,
             url: `${SITE}/producto/${record.id}`,
             brand: record.brand || "Generico",
             // product_type: Categoría personalizada para filtros de Product Sets
@@ -78,7 +86,8 @@ serve(async (req) => {
         // Agregar imágenes adicionales si existen
         if (additionalImages.length > 0) {
             data.additional_image_link = additionalImages.join(",");
-            console.log(`📸 Imágenes adicionales: ${additionalImages.length}`);
+            console.log(`🖼️ Imagen principal: ${mainImage}`);
+            console.log(`🖼️ Imágenes adicionales (${additionalImages.length}):`, additionalImages);
         }
 
 
