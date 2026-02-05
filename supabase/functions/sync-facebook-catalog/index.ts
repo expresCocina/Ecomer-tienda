@@ -65,10 +65,11 @@ serve(async (req) => {
             image_url: record.images?.[0] || "",
             url: `${SITE}/producto/${record.id}`,
             brand: record.brand || "Generico",
-            // NUEVO: Agregar categoría para Product Sets
+            // product_type: Categoría personalizada para filtros de Product Sets
             product_type: categoryName,
-            // CORREGIDO: Enviar nombre de categoría en lugar de ID para que los conjuntos funcionen
-            google_product_category: categoryName,
+            // google_product_category: Categoría de taxonomía de Google
+            // Para relojes usamos "188" que corresponde a "Apparel & Accessories > Jewelry > Watches"
+            google_product_category: "188",
         };
 
         // Post a Facebook Graph API
