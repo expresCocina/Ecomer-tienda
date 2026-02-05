@@ -248,10 +248,11 @@ export const Navbar = () => {
                             )}
                         </button>
 
-                        {/* Mobile Menu Button */}
+                        {/* Mobile Menu Button - Tema oscuro/dorado */}
                         <button
                             onClick={toggleMobileMenu}
-                            className="md:hidden flex items-center justify-center w-10 h-10 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-300"
+                            className="md:hidden flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 touch-target text-gold-400 hover:text-gold-300 active:text-gold-200 hover:bg-gold-500/10 active:bg-gold-500/20 rounded-xl transition-all duration-300 tap-highlight-none"
+                            aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
                         >
                             {isMobileMenuOpen ? (
                                 <X className="w-6 h-6" />
@@ -328,16 +329,16 @@ export const Navbar = () => {
                 </div>
             </div>
 
-            {/* Mobile Menu */}
+            {/* Mobile Menu - Tema oscuro/dorado optimizado */}
             {isMobileMenuOpen && (
-                <div className="md:hidden bg-white/95 backdrop-blur-lg border-t border-gray-100 shadow-lg animate-fade-in">
-                    <div className="px-4 py-4 space-y-1">
+                <div className="md:hidden bg-dark-mobile backdrop-blur-lg border-t-2 border-gold-500/20 shadow-2xl shadow-gold-500/10 animate-fade-in">
+                    <div className="mobile-padding py-4 sm:py-5 space-y-1.5">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.path}
                                 to={link.path}
                                 onClick={closeMobileMenu}
-                                className="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-all font-medium"
+                                className="block px-4 py-3 sm:py-3.5 text-mobile-base text-gold-400 hover:text-gold-300 active:text-gold-200 hover:bg-gold-500/10 active:bg-gold-500/20 rounded-xl transition-all duration-200 font-medium touch-target tap-highlight-none"
                             >
                                 {link.name}
                             </Link>
@@ -346,7 +347,7 @@ export const Navbar = () => {
                             <Link
                                 to={isAdmin ? '/admin/dashboard' : '/cuenta'}
                                 onClick={closeMobileMenu}
-                                className="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-all font-medium"
+                                className="block px-4 py-3 sm:py-3.5 text-mobile-base text-gold-400 hover:text-gold-300 active:text-gold-200 hover:bg-gold-500/10 active:bg-gold-500/20 rounded-xl transition-all duration-200 font-medium touch-target tap-highlight-none"
                             >
                                 Mi Cuenta
                             </Link>
@@ -354,7 +355,7 @@ export const Navbar = () => {
                             <Link
                                 to="/admin/login"
                                 onClick={closeMobileMenu}
-                                className="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-all font-medium"
+                                className="block px-4 py-3 sm:py-3.5 text-mobile-base text-gold-400 hover:text-gold-300 active:text-gold-200 hover:bg-gold-500/10 active:bg-gold-500/20 rounded-xl transition-all duration-200 font-medium touch-target tap-highlight-none"
                             >
                                 Iniciar Sesión
                             </Link>
