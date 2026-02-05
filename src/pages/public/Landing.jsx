@@ -63,7 +63,7 @@ export const Landing = () => {
             />
             {/* Hero Section - Optimizado para móvil */}
             <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white overflow-hidden">
-                <div className="container-mobile py-16 sm:py-20 md:py-24 lg:py-32">
+                <div className="container-mobile pt-24 pb-16 sm:pt-28 sm:pb-20 md:py-24 lg:py-32">
                     <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 items-center">
                         {/* Contenido Izquierda - Responsive */}
                         <div className="text-center lg:text-left">
