@@ -6,122 +6,6 @@ const corsHeaders = {
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-/**
- * Elimina todas las variantes de un producto de Facebook
- */
-async function deleteProductVariants(productId: string, TOKEN: string, CATALOG: string) {
-    try {
-        console.log(`🗑️ Buscando variantes antiguas del producto ${productId}...`);
-
-        // Buscar todas las variantes con este item_group_id
-        const searchRes = await fetch(
-            `https://graph.facebook.com/v21.0/${CATALOG}/products?filter={"item_group_id":{"eq":"${productId}"}}`,
-            {
-                headers: { "Authorization": "Bearer " + TOKEN }
-            }
-        );
-
-        if (!searchRes.ok) {
-            console.log(`⚠️ No se pudieron buscar variantes (puede ser primera vez)`);
-            return;
-        }
-
-        const { data } = await searchRes.json();
-
-        if (!data || data.length === 0) {
-            console.log(`✅ No hay variantes antiguas para eliminar`);
-            return;
-        }
-
-        console.log(`🗑️ Eliminando ${data.length} variantes antiguas...`);
-
-        // Eliminar cada variante
-        for (const variant of data) {
-            await fetch(
-                `https://graph.facebook.com/v21.0/${variant.id}`,
-                {
-                    method: "DELETE",
-                    headers: { "Authorization": "Bearer " + TOKEN }
-                }
-            );
-            console.log(`  ✅ Variante ${variant.id} eliminada`);
-        }
-
-        console.log(`✅ Todas las variantes antiguas eliminadas`);
-    } catch (err) {
-        console.error(`⚠️ Error eliminando variantes (continuando):`, err.message);
-    }
-}
-
-/**
- * Crea variantes de producto en Facebook (una por cada imagen)
- */
-async function createProductVariants(
-    record: any,
-    categoryName: string,
-    images: string[],
-    TOKEN: string,
-    CATALOG: string,
-    SITE: string
-) {
-    const results = [];
-
-    console.log(`📦 Creando ${images.length} variantes del producto...`);
-
-    for (let i = 0; i < images.length; i++) {
-        const isMainVariant = i === 0;
-
-        const data: any = {
-            retailer_id: record.id, // MISMO ID para todas las variantes
-            item_group_id: record.id,
-            name: record.name, // MISMO nombre para todas
-            description: record.description || record.name,
-            availability: record.stock > 0 ? "in stock" : "out of stock",
-            condition: "new",
-            price: (Math.round(record.price * 100)).toString(),
-            currency: "COP",
-            image_url: images[i],
-            url: `${SITE}/producto/${record.id}`,
-            brand: record.brand || "Generico",
-            product_type: categoryName,
-            google_product_category: categoryName,
-            // Diferenciar variantes por color (Facebook agrupa por este campo)
-            color: `Vista ${i + 1}`,
-        };
-
-        console.log(`  📸 Variante ${i + 1}/${images.length}: ${images[i].substring(0, 60)}...`);
-
-        const res = await fetch(
-            `https://graph.facebook.com/v21.0/${CATALOG}/products`,
-            {
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + TOKEN,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            }
-        );
-
-        const result = await res.json();
-
-        if (!res.ok) {
-            console.error(`  ❌ Error en variante ${i + 1}:`, result);
-            results.push({ success: false, error: result, index: i });
-        } else {
-            console.log(`  ✅ Variante ${i + 1} creada: ${result.id}`);
-            results.push({ success: true, id: result.id, index: i });
-        }
-
-        // Pequeño delay para evitar rate limiting
-        if (i < images.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 200));
-        }
-    }
-
-    return results;
-}
-
 serve(async (req) => {
     if (req.method === "OPTIONS") {
         return new Response("ok", { headers: corsHeaders });
@@ -176,39 +60,71 @@ serve(async (req) => {
             throw new Error("Producto sin imágenes válidas");
         }
 
-        // PASO 1: Eliminar variantes antiguas
-        await deleteProductVariants(record.id, TOKEN, CATALOG);
+        // Primera imagen como principal
+        const mainImage = allImages[0];
+        // Resto de imágenes como adicionales (máximo 20 según Facebook)
+        const additionalImages = allImages.slice(1, 20);
 
-        // PASO 2: Crear nuevas variantes
-        const results = await createProductVariants(
-            record,
-            categoryName,
-            allImages,
-            TOKEN,
-            CATALOG,
-            SITE
+        console.log(`🖼️ Imagen principal: ${mainImage.substring(0, 60)}...`);
+        if (additionalImages.length > 0) {
+            console.log(`📸 Imágenes adicionales: ${additionalImages.length}`);
+            additionalImages.forEach((img, i) => {
+                console.log(`  ${i + 1}. ${img.substring(0, 60)}...`);
+            });
+        }
+
+        // Preparar datos para Facebook
+        const data: any = {
+            retailer_id: record.id,
+            name: record.name,
+            description: record.description || record.name,
+            availability: record.stock > 0 ? "in stock" : "out of stock",
+            condition: "new",
+            price: (Math.round(record.price * 100)).toString(),
+            currency: "COP",
+            image_url: mainImage,
+            url: `${SITE}/producto/${record.id}`,
+            brand: record.brand || "Generico",
+            product_type: categoryName,
+            google_product_category: categoryName,
+        };
+
+        // Agregar imágenes adicionales si existen
+        if (additionalImages.length > 0) {
+            data.additional_image_urls = additionalImages;
+        }
+
+        console.log(`📦 Enviando producto a Facebook...`);
+
+        // Enviar a Facebook Graph API
+        const res = await fetch(
+            `https://graph.facebook.com/v21.0/${CATALOG}/products`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + TOKEN,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            }
         );
 
-        // PASO 3: Verificar resultados
-        const successCount = results.filter(r => r.success).length;
-        const failCount = results.filter(r => !r.success).length;
+        const fb = await res.json();
 
-        console.log(`\n📊 Resumen:`);
-        console.log(`  ✅ Variantes creadas: ${successCount}/${allImages.length}`);
-        if (failCount > 0) {
-            console.log(`  ❌ Variantes fallidas: ${failCount}`);
+        if (!res.ok) {
+            console.error("❌ Error en Facebook API:", fb);
+            throw new Error(`Facebook Error: ${JSON.stringify(fb)}`);
         }
 
-        if (successCount === 0) {
-            throw new Error("No se pudo crear ninguna variante");
-        }
+        console.log("✅ Producto sincronizado exitosamente");
+        console.log(`   ID de Facebook: ${fb.id}`);
+        console.log(`   Imágenes totales: ${allImages.length} (1 principal + ${additionalImages.length} adicionales)`);
 
         return new Response(
             JSON.stringify({
                 success: true,
-                variants_created: successCount,
-                variants_failed: failCount,
-                results: results
+                fb_id: fb.id,
+                images_count: allImages.length
             }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
