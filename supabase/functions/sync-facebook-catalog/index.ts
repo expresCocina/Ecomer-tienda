@@ -67,7 +67,8 @@ serve(async (req) => {
             brand: record.brand || "Generico",
             // NUEVO: Agregar categoría para Product Sets
             product_type: categoryName,
-            google_product_category: record.category_id?.toString() || "0",
+            // CORREGIDO: Enviar nombre de categoría en lugar de ID para que los conjuntos funcionen
+            google_product_category: categoryName,
         };
 
         // Post a Facebook Graph API
