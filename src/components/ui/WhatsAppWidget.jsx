@@ -46,9 +46,9 @@ export const WhatsAppWidget = () => {
 
     return (
         <>
-            {/* Widget flotante - Optimizado para móvil */}
+            {/* Widget flotante - Optimizado para móvil - Posición ajustada */}
             <div
-                className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 transition-all duration-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
+                className={`fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 transition-all duration-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
                     }`}
             >
                 {/* Tooltip - Responsive */}
