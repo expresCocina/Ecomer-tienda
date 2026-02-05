@@ -93,7 +93,9 @@ serve(async (req) => {
 
         console.log("✅ Éxito en Facebook. ID:", fb.id);
 
-        // ACTUALIZACIÓN CRÍTICA: Guardar el ID de Facebook en Supabase
+        // DESHABILITADO: Esto causa un bucle infinito porque dispara el webhook de nuevo
+        // TODO: Implementar lógica para evitar bucle (ej: flag, timestamp check, etc.)
+        /*
         const { error: updateError } = await supabase
             .from("products")
             .update({
@@ -107,6 +109,7 @@ serve(async (req) => {
             console.error("❌ Error guardando ID en DB:", updateError);
             throw updateError;
         }
+        */
 
         return new Response(
             JSON.stringify({ success: true, fb_id: fb.id }),
