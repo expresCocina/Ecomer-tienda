@@ -70,7 +70,7 @@ export const Landing = () => {
                             <h1 className="font-display text-mobile-3xl font-bold mb-4 sm:mb-6 animate-fade-in-up text-shadow-lg leading-tight">
                                 Elegancia <span className="text-gradient-gold">Atemporal</span> en tu Muñeca
                             </h1>
-                            <p className="text-mobile-lg mb-6 sm:mb-8 text-gray-300 animate-slide-up leading-relaxed">
+                            <p className="text-mobile-lg mb-6 sm:mb-8 text-gray-100 animate-slide-up leading-relaxed font-medium">
                                 Descubre nuestra exclusiva colección de relojes para hombre. Precisión, estilo y distinción.
                             </p>
                             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 animate-slide-up justify-center lg:justify-start">
