@@ -493,46 +493,46 @@ export const ProductDetail = () => {
                 )}
             </div>
 
-            {/* Barra Sticky Flotante para Móvil */}
+            {/* Barra Sticky Flotante para Móvil - Tema oscuro/dorado */}
             {product && inStock && (
                 <div
-                    className={`md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 shadow-2xl transition-transform duration-300 z-50 ${showStickyBar ? 'translate-y-0' : 'translate-y-full'
+                    className={`md:hidden fixed bottom-0 left-0 right-0 bg-gradient-to-t from-primary-950 to-primary-900 backdrop-blur-xl border-t-2 border-gold-500/30 shadow-2xl shadow-gold-500/20 transition-transform duration-300 z-50 ${showStickyBar ? 'translate-y-0' : 'translate-y-full'
                         }`}
                 >
-                    <div className="px-4 py-3">
-                        <div className="flex items-center gap-3">
+                    <div className="mobile-padding py-3 sm:py-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             {/* Precio compacto */}
                             <div className="flex-shrink-0">
-                                <p className="text-xs text-gray-500">Precio</p>
-                                <p className="text-lg font-bold text-primary-600">
+                                <p className="text-xs text-gray-400">Precio</p>
+                                <p className="text-base sm:text-lg font-bold text-gold-500">
                                     {formatPrice(finalPrice)}
                                 </p>
                             </div>
 
-                            {/* Selector de cantidad compacto */}
-                            <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                            {/* Selector de cantidad compacto - Tema oscuro */}
+                            <div className="flex items-center gap-1.5 sm:gap-2 bg-primary-800/50 border border-gold-500/20 rounded-lg px-2 sm:px-3 py-2">
                                 <button
                                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                    className="w-7 h-7 flex items-center justify-center bg-white rounded-md text-gray-600 hover:bg-gray-100 active:scale-95 transition-all shadow-sm"
+                                    className="w-7 h-7 flex items-center justify-center bg-gold-500/10 hover:bg-gold-500/20 active:bg-gold-500/30 rounded-md text-gold-400 hover:text-gold-300 transition-all touch-target tap-highlight-none"
                                 >
                                     <span className="text-lg font-semibold">−</span>
                                 </button>
-                                <span className="w-8 text-center font-semibold text-gray-900">{quantity}</span>
+                                <span className="w-8 text-center font-semibold text-gold-400">{quantity}</span>
                                 <button
                                     onClick={() => setQuantity(Math.min(Math.min(product.stock, 99), quantity + 1))}
-                                    className="w-7 h-7 flex items-center justify-center bg-white rounded-md text-gray-600 hover:bg-gray-100 active:scale-95 transition-all shadow-sm"
+                                    className="w-7 h-7 flex items-center justify-center bg-gold-500/10 hover:bg-gold-500/20 active:bg-gold-500/30 rounded-md text-gold-400 hover:text-gold-300 transition-all touch-target tap-highlight-none"
                                 >
                                     <span className="text-lg font-semibold">+</span>
                                 </button>
                             </div>
 
-                            {/* Botón agregar al carrito */}
+                            {/* Botón agregar al carrito - Tema dorado */}
                             <button
                                 onClick={handleAddToCart}
-                                className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 px-4 rounded-xl font-semibold hover:from-primary-700 hover:to-primary-800 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2"
+                                className="flex-1 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 active:from-gold-700 active:to-gold-800 text-primary-900 py-3 px-3 sm:px-4 rounded-xl font-bold transition-all shadow-lg shadow-gold-500/30 hover:shadow-gold-500/50 flex items-center justify-center gap-2 touch-target tap-highlight-none"
                             >
-                                <ShoppingCart className="w-5 h-5" />
-                                <span className="text-sm">Agregar</span>
+                                <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+                                <span className="text-sm sm:text-base">Agregar</span>
                             </button>
                         </div>
                     </div>
