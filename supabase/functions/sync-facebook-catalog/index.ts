@@ -96,8 +96,27 @@ serve(async (req) => {
 
         console.log(`📦 Sincronizando producto con Facebook...`);
 
-        // Intentar actualizar primero (si el producto ya existe en Facebook)
-        let res = await fetch(
+        // Verificar si el producto ya existe en Facebook
+        let productExists = false;
+        if (record.facebook_product_id) {
+            console.log(`🔍 Verificando si producto existe en Facebook (ID: ${record.facebook_product_id})...`);
+            const checkRes = await fetch(
+                `https://graph.facebook.com/v21.0/${record.facebook_product_id}`,
+                {
+                    headers: { "Authorization": "Bearer " + TOKEN }
+                }
+            );
+            productExists = checkRes.ok;
+            console.log(productExists ? `✅ Producto existe, actualizando...` : `⚠️ Producto no existe, creando nuevo...`);
+        } else {
+            console.log(`⚠️ Sin facebook_product_id, creando nuevo producto...`);
+        }
+
+        // Preparar request según si existe o no
+        const requestData = productExists ? { ...data, method: "UPDATE" } : data;
+
+        // Enviar a Facebook
+        const res = await fetch(
             `https://graph.facebook.com/v21.0/${CATALOG}/products`,
             {
                 method: "POST",
@@ -105,34 +124,11 @@ serve(async (req) => {
                     "Authorization": "Bearer " + TOKEN,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    ...data,
-                    method: "UPDATE"
-                }),
+                body: JSON.stringify(requestData),
             }
         );
 
-        let fb = await res.json();
-
-        // Si falla porque el producto no existe, intentar crear
-        if (!res.ok && fb.error && fb.error.message && fb.error.message.includes("retailer_id")) {
-            console.log(`⚠️ Producto no existe en Facebook, creando nuevo...`);
-
-            // Intentar crear sin el campo method
-            res = await fetch(
-                `https://graph.facebook.com/v21.0/${CATALOG}/products`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + TOKEN,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(data),
-                }
-            );
-
-            fb = await res.json();
-        }
+        const fb = await res.json();
 
         if (!res.ok) {
             console.error("❌ Error en Facebook API:", fb);
