@@ -50,8 +50,11 @@ serve(async (req) => {
 
         console.log(`📁 Categoría: ${categoryName}`);
 
+        // Preparar imágenes adicionales (Facebook soporta hasta 20 imágenes)
+        const additionalImages = record.images?.slice(1, 20) || [];
+
         // Preparar datos para Facebook
-        const data = {
+        const data: any = {
             retailer_id: record.id,
             name: record.name,
             description: record.description || record.name,
@@ -67,10 +70,17 @@ serve(async (req) => {
             brand: record.brand || "Generico",
             // product_type: Categoría personalizada para filtros de Product Sets
             product_type: categoryName,
-            // google_product_category: Categoría de taxonomía de Google
-            // Para relojes usamos "188" que corresponde a "Apparel & Accessories > Jewelry > Watches"
-            google_product_category: "188",
+            // google_product_category: Usar nombre de categoría directamente
+            // Facebook aceptará el nombre personalizado si no encuentra coincidencia en taxonomía
+            google_product_category: categoryName,
         };
+
+        // Agregar imágenes adicionales si existen
+        if (additionalImages.length > 0) {
+            data.additional_image_link = additionalImages.join(",");
+            console.log(`📸 Imágenes adicionales: ${additionalImages.length}`);
+        }
+
 
         // Post a Facebook Graph API
         const res = await fetch(
