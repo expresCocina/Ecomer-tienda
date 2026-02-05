@@ -133,7 +133,16 @@ export const Checkout = () => {
     return (
         <div className="min-h-screen bg-gradient-to-b from-primary-900 via-primary-900 to-primary-950 pt-20 sm:pt-24 md:pt-28 pb-8">
             <div className="container-mobile">
-                <h1 className="text-mobile-3xl font-bold text-gold-400 mb-6 sm:mb-8">Finalizar Compra</h1>
+                {/* Logo */}
+                <div className="flex justify-center mb-6 sm:mb-8">
+                    <img
+                        src="/logo.svg"
+                        alt="C&J Relojería"
+                        className="h-12 sm:h-16 w-auto"
+                    />
+                </div>
+
+                <h1 className="text-mobile-3xl font-bold text-gold-400 mb-6 sm:mb-8 text-center">Finalizar Compra</h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Formulario */}
