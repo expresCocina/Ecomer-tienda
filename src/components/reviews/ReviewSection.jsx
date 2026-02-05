@@ -127,8 +127,8 @@ export const ReviewSection = ({ productId }) => {
                 )}
             </div>
 
-            {/* Lista de reseñas */}
-            <div className="space-y-6 mb-12">
+            {/* Lista de reseñas - Carrusel horizontal en móvil, grid en desktop */}
+            <div className="mb-12">
                 {loading ? (
                     <p className="text-center text-gray-400">Cargando reseñas...</p>
                 ) : reviews.length === 0 ? (
@@ -138,24 +138,57 @@ export const ReviewSection = ({ productId }) => {
                         </p>
                     </div>
                 ) : (
-                    reviews.map((review) => (
-                        <div key={review.id} className="py-6 px-5 bg-primary-800/50 border-2 border-gold-500/20 rounded-xl hover:shadow-lg hover:shadow-gold-500/10 transition-all">
-                            <div className="flex items-start justify-between mb-3">
-                                <div className="flex-1">
-                                    <h3 className="font-display font-semibold text-gold-400 text-base">{review.customer_name}</h3>
-                                    <p className="text-xs text-gray-400 mt-1">
-                                        {new Date(review.created_at).toLocaleDateString('es-ES', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric',
-                                        })}
-                                    </p>
-                                </div>
-                                <StarRating rating={review.rating} size="sm" className="text-gold-500" />
+                    <>
+                        {/* Carrusel horizontal en móvil */}
+                        <div className="md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
+                            <div className="flex gap-4 pb-4" style={{ scrollSnapType: 'x mandatory' }}>
+                                {reviews.map((review) => (
+                                    <div
+                                        key={review.id}
+                                        className="flex-shrink-0 w-[85vw] sm:w-[70vw] py-6 px-5 bg-primary-800/50 border-2 border-gold-500/20 rounded-xl hover:shadow-lg hover:shadow-gold-500/10 transition-all"
+                                        style={{ scrollSnapAlign: 'start' }}
+                                    >
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div className="flex-1">
+                                                <h3 className="font-display font-semibold text-gold-400 text-base">{review.customer_name}</h3>
+                                                <p className="text-xs text-gray-400 mt-1">
+                                                    {new Date(review.created_at).toLocaleDateString('es-ES', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric',
+                                                    })}
+                                                </p>
+                                            </div>
+                                            <StarRating rating={review.rating} size="sm" className="text-gold-500" />
+                                        </div>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{review.comment}</p>
+                                    </div>
+                                ))}
                             </div>
-                            <p className="text-gray-300 text-sm leading-relaxed">{review.comment}</p>
                         </div>
-                    ))
+
+                        {/* Grid vertical en desktop */}
+                        <div className="hidden md:block space-y-6">
+                            {reviews.map((review) => (
+                                <div key={review.id} className="py-6 px-5 bg-primary-800/50 border-2 border-gold-500/20 rounded-xl hover:shadow-lg hover:shadow-gold-500/10 transition-all">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div className="flex-1">
+                                            <h3 className="font-display font-semibold text-gold-400 text-base">{review.customer_name}</h3>
+                                            <p className="text-xs text-gray-400 mt-1">
+                                                {new Date(review.created_at).toLocaleDateString('es-ES', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric',
+                                                })}
+                                            </p>
+                                        </div>
+                                        <StarRating rating={review.rating} size="sm" className="text-gold-500" />
+                                    </div>
+                                    <p className="text-gray-300 text-sm leading-relaxed">{review.comment}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
 
