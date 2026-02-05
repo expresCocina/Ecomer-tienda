@@ -13,7 +13,7 @@ import { trackInitiateCheckout, trackPurchase } from '../../lib/fbPixel';
 import { capiInitiateCheckout, capiPurchase } from '../../lib/fbCapi';
 
 /**
- * Página de Checkout
+ * Página de Checkout - Tema oscuro/dorado
  */
 export const Checkout = () => {
     const navigate = useNavigate();
@@ -40,16 +40,21 @@ export const Checkout = () => {
     // Redirigir si el carrito está vacío
     if (items.length === 0) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="text-center">
-                    <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-primary-900 to-primary-950">
+                <div className="text-center mobile-padding">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gold-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Package className="w-10 h-10 sm:w-12 sm:h-12 text-gold-400" />
+                    </div>
+                    <h2 className="text-mobile-2xl font-bold text-gold-400 mb-3">
                         Tu carrito está vacío
                     </h2>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-mobile-base text-gray-400 mb-8 leading-relaxed">
                         Añade productos antes de proceder al checkout
                     </p>
-                    <Button onClick={() => navigate('/tienda')}>
+                    <Button
+                        onClick={() => navigate('/tienda')}
+                        className="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-primary-900 font-bold"
+                    >
                         Ir a la tienda
                     </Button>
                 </div>
@@ -126,16 +131,16 @@ export const Checkout = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-20 sm:pt-24 md:pt-28 pb-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-8">Finalizar Compra</h1>
+        <div className="min-h-screen bg-gradient-to-b from-primary-900 via-primary-900 to-primary-950 pt-20 sm:pt-24 md:pt-28 pb-8">
+            <div className="container-mobile">
+                <h1 className="text-mobile-3xl font-bold text-gold-400 mb-6 sm:mb-8">Finalizar Compra</h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Formulario */}
                     <div className="lg:col-span-2">
                         <Card>
                             <CardHeader>
-                                <h2 className="text-xl font-semibold text-gray-900">
+                                <h2 className="text-mobile-xl font-bold text-gold-400">
                                     Información de Envío
                                 </h2>
                             </CardHeader>
@@ -217,7 +222,7 @@ export const Checkout = () => {
                     <div className="lg:col-span-1">
                         <Card className="sticky top-24">
                             <CardHeader>
-                                <h2 className="text-xl font-semibold text-gray-900">
+                                <h2 className="text-mobile-xl font-bold text-gold-400">
                                     Resumen del Pedido
                                 </h2>
                             </CardHeader>
@@ -227,7 +232,7 @@ export const Checkout = () => {
                                     <div className="space-y-3">
                                         {items.map((item) => (
                                             <div key={item.id} className="flex gap-3">
-                                                <div className="w-16 h-16 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+                                                <div className="w-16 h-16 flex-shrink-0 bg-primary-800/50 border border-gold-500/20 rounded-lg overflow-hidden">
                                                     {item.image ? (
                                                         <img
                                                             src={item.image}
@@ -236,18 +241,18 @@ export const Checkout = () => {
                                                         />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center">
-                                                            <Package className="w-6 h-6 text-gray-400" />
+                                                            <Package className="w-6 h-6 text-gold-400" />
                                                         </div>
                                                     )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="text-sm font-medium text-gray-900 truncate">
+                                                    <h3 className="text-sm font-semibold text-gold-400 truncate">
                                                         {item.name}
                                                     </h3>
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-xs sm:text-sm text-gray-400">
                                                         Cantidad: {item.quantity}
                                                     </p>
-                                                    <p className="text-sm font-semibold text-primary-600">
+                                                    <p className="text-sm font-bold text-gold-500">
                                                         {formatPrice(item.price * item.quantity)}
                                                     </p>
                                                 </div>
@@ -256,30 +261,30 @@ export const Checkout = () => {
                                     </div>
 
                                     {/* Divider */}
-                                    <div className="border-t border-gray-200 pt-4">
+                                    <div className="border-t-2 border-gold-500/20 pt-4">
                                         {/* Subtotal */}
                                         <div className="flex items-center justify-between mb-2">
-                                            <span className="text-gray-600">Subtotal</span>
-                                            <span className="font-medium text-gray-900">
+                                            <span className="text-mobile-base text-gray-400">Subtotal</span>
+                                            <span className="font-semibold text-gold-400">
                                                 {formatPrice(subtotal)}
                                             </span>
                                         </div>
 
                                         {/* Envío */}
                                         <div className="flex items-center justify-between mb-2">
-                                            <span className="text-gray-600">Envío</span>
-                                            <span className="font-medium text-gray-900">
+                                            <span className="text-mobile-base text-gray-400">Envío</span>
+                                            <span className="font-semibold text-gold-400">
                                                 A calcular
                                             </span>
                                         </div>
 
                                         {/* Total */}
-                                        <div className="border-t border-gray-200 pt-4 mt-4">
+                                        <div className="border-t-2 border-gold-500/20 pt-4 mt-4">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-lg font-semibold text-gray-900">
+                                                <span className="text-mobile-lg font-bold text-gold-400">
                                                     Total
                                                 </span>
-                                                <span className="text-2xl font-bold text-primary-600">
+                                                <span className="text-mobile-2xl font-bold text-gold-500">
                                                     {formatPrice(subtotal)}
                                                 </span>
                                             </div>
@@ -287,9 +292,9 @@ export const Checkout = () => {
                                     </div>
 
                                     {/* Nota de envío */}
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                        <p className="text-sm text-blue-900">
-                                            <strong>Nota:</strong> El costo de envío se calculará según tu ubicación y será confirmado por WhatsApp.
+                                    <div className="bg-blue-900/30 border-2 border-blue-500/30 rounded-lg p-4 backdrop-blur-sm">
+                                        <p className="text-sm text-blue-300 leading-relaxed">
+                                            <strong className="text-blue-200">Nota:</strong> El costo de envío se calculará según tu ubicación y será confirmado por WhatsApp.
                                         </p>
                                     </div>
                                 </div>
