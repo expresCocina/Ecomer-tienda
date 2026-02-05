@@ -70,12 +70,11 @@ async function createProductVariants(
 
     for (let i = 0; i < images.length; i++) {
         const isMainVariant = i === 0;
-        const variantId = `${record.id}-img-${i}`;
 
-        const data = {
-            retailer_id: isMainVariant ? record.id : variantId,
+        const data: any = {
+            retailer_id: record.id, // MISMO ID para todas las variantes
             item_group_id: record.id,
-            name: isMainVariant ? record.name : `${record.name} - Vista ${i + 1}`,
+            name: record.name, // MISMO nombre para todas
             description: record.description || record.name,
             availability: record.stock > 0 ? "in stock" : "out of stock",
             condition: "new",
@@ -86,6 +85,8 @@ async function createProductVariants(
             brand: record.brand || "Generico",
             product_type: categoryName,
             google_product_category: categoryName,
+            // Diferenciar variantes por color (Facebook agrupa por este campo)
+            color: `Vista ${i + 1}`,
         };
 
         console.log(`  📸 Variante ${i + 1}/${images.length}: ${images[i].substring(0, 60)}...`);
