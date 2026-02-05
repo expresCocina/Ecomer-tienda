@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, CheckCircle } from 'lucide-react';
+import { Package, CheckCircle, Watch } from 'lucide-react';
 import { useCartStore, selectSubtotal } from '../../store/cartStore';
 import { createOrder } from '../../lib/supabase';
 import { formatPrice } from '../../lib/utils';
@@ -133,13 +133,24 @@ export const Checkout = () => {
     return (
         <div className="min-h-screen bg-gradient-to-b from-primary-900 via-primary-900 to-primary-950 pt-20 sm:pt-24 md:pt-28 pb-8">
             <div className="container-mobile">
-                {/* Logo */}
+                {/* Logo - Estilo Navbar */}
                 <div className="flex justify-center mb-8 sm:mb-10">
-                    <img
-                        src="/logo.svg"
-                        alt="C&J Relojería"
-                        className="h-20 sm:h-24 md:h-28 w-auto drop-shadow-2xl"
-                    />
+                    <div className="flex items-center space-x-3 group">
+                        {/* Icon con gradiente dorado */}
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-gold-500 via-gold-600 to-gold-700 rounded-xl flex items-center justify-center shadow-lg shadow-gold-500/30">
+                            <Watch className="w-7 h-7 sm:w-8 sm:h-8 text-primary-900" />
+                        </div>
+
+                        {/* Texto del logo con gradiente */}
+                        <div className="flex flex-col">
+                            <span className="font-display text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 bg-clip-text text-transparent tracking-tight">
+                                C&J
+                            </span>
+                            <span className="text-sm sm:text-base font-bold text-gold-400 tracking-widest uppercase">
+                                Relojería
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 <h1 className="text-mobile-3xl font-bold text-gold-400 mb-6 sm:mb-8 text-center">Finalizar Compra</h1>
