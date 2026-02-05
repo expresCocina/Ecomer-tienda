@@ -134,11 +134,11 @@ export const Checkout = () => {
         <div className="min-h-screen bg-gradient-to-b from-primary-900 via-primary-900 to-primary-950 pt-20 sm:pt-24 md:pt-28 pb-8">
             <div className="container-mobile">
                 {/* Logo */}
-                <div className="flex justify-center mb-6 sm:mb-8">
+                <div className="flex justify-center mb-8 sm:mb-10">
                     <img
                         src="/logo.svg"
                         alt="C&J Relojería"
-                        className="h-12 sm:h-16 w-auto"
+                        className="h-20 sm:h-24 md:h-28 w-auto drop-shadow-2xl"
                     />
                 </div>
 
