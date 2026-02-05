@@ -94,10 +94,10 @@ serve(async (req) => {
             data.additional_image_urls = additionalImages;
         }
 
-        console.log(`📦 Enviando producto a Facebook...`);
+        console.log(`📦 Sincronizando producto con Facebook...`);
 
-        // Enviar a Facebook Graph API
-        const res = await fetch(
+        // Intentar actualizar primero (si el producto ya existe en Facebook)
+        let res = await fetch(
             `https://graph.facebook.com/v21.0/${CATALOG}/products`,
             {
                 method: "POST",
@@ -105,11 +105,34 @@ serve(async (req) => {
                     "Authorization": "Bearer " + TOKEN,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify({
+                    ...data,
+                    method: "UPDATE"
+                }),
             }
         );
 
-        const fb = await res.json();
+        let fb = await res.json();
+
+        // Si falla porque el producto no existe, intentar crear
+        if (!res.ok && fb.error && fb.error.message && fb.error.message.includes("retailer_id")) {
+            console.log(`⚠️ Producto no existe en Facebook, creando nuevo...`);
+
+            // Intentar crear sin el campo method
+            res = await fetch(
+                `https://graph.facebook.com/v21.0/${CATALOG}/products`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + TOKEN,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                }
+            );
+
+            fb = await res.json();
+        }
 
         if (!res.ok) {
             console.error("❌ Error en Facebook API:", fb);
