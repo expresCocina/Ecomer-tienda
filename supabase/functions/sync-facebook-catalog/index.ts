@@ -120,6 +120,22 @@ serve(async (req) => {
         console.log(`   ID de Facebook: ${fb.id}`);
         console.log(`   Imágenes totales: ${allImages.length} (1 principal + ${additionalImages.length} adicionales)`);
 
+        // Guardar facebook_product_id en la base de datos
+        // Esto es CRÍTICO para que el trigger de eliminación funcione
+        console.log(`💾 Guardando facebook_product_id en la base de datos...`);
+
+        const { error: updateError } = await supabase
+            .from("products")
+            .update({ facebook_product_id: fb.id })
+            .eq("id", record.id);
+
+        if (updateError) {
+            console.error("⚠️ Error guardando facebook_product_id:", updateError);
+            // No lanzamos error porque el producto ya se sincronizó exitosamente
+        } else {
+            console.log(`✅ facebook_product_id guardado: ${fb.id}`);
+        }
+
         return new Response(
             JSON.stringify({
                 success: true,
