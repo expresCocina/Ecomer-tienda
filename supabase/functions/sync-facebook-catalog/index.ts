@@ -86,37 +86,33 @@ serve(async (req) => {
         const finalPrice = record.offer_price || record.price;
         const hasDiscount = record.offer_price && record.offer_price < record.price;
 
+        // Objeto data para Batch API (SIN retailer_id, SIN google_product_category)
         const data: any = {
-            retailer_id: record.id,
             name: record.name,
             description: record.description || record.name,
             availability: record.stock > 0 ? "in stock" : "out of stock",
             condition: "new",
-            price: (Math.round(record.price * 100)).toString(), // Precio ORIGINAL (siempre)
+            price: (Math.round(record.price * 100)).toString(),
             currency: "COP",
             image_url: mainImage,
             url: `${SITE}/producto/${record.id}`,
             brand: record.brand || "Generico",
-            product_type: categoryName,
-            google_product_category: categoryName,
+            product_type: categoryName,  // Necesario para reglas dinámicas de Facebook
         };
 
-        // Agregar precio con descuento si existe
+        // Agregar precio con descuento si existe (SIN sale_price_effective_date)
         if (hasDiscount) {
             data.sale_price = (Math.round(record.offer_price * 100)).toString();
-            // Fecha efectiva del descuento (permanente por ahora)
-            data.sale_price_effective_date = `${new Date().toISOString().split('T')[0]}/${new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}`;
             console.log(`💰 Precio original: $${record.price.toLocaleString()} → Descuento: $${record.offer_price.toLocaleString()}`);
         } else {
             console.log(`💰 Precio: $${record.price.toLocaleString()}`);
         }
 
         // Agregar imágenes adicionales si existen
-        // Facebook puede usar additional_image_link O additional_image_urls dependiendo del endpoint
-        // Probamos ambos para máxima compatibilidad
+        // Batch API requiere additional_image_urls (plural)
         if (additionalImages.length > 0) {
-            data.additional_image_link = additionalImages;  // Formato para feeds
-            console.log(`🖼️ Campo additional_image_link configurado con ${additionalImages.length} URLs`);
+            data.additional_image_urls = additionalImages;
+            console.log(`🖼️ Campo additional_image_urls configurado con ${additionalImages.length} URLs`);
         }
 
         // Log del payload completo para debugging
@@ -124,9 +120,7 @@ serve(async (req) => {
 
         console.log(`📦 Sincronizando producto con Facebook usando Batch API...`);
 
-        // BATCH API: La forma correcta de actualizar productos preservando anuncios
-        // Usamos el Batch API con method: "UPDATE" y requests array
-
+        // BATCH API: retailer_id va FUERA de data, al mismo nivel que method
         const batchRequest = {
             method: "UPDATE",
             retailer_id: record.id,
