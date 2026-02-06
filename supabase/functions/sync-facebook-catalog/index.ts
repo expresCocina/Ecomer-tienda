@@ -112,21 +112,41 @@ serve(async (req) => {
             console.log(`⚠️ Sin facebook_product_id, creando nuevo producto...`);
         }
 
-        // Preparar request según si existe o no
-        const requestData = productExists ? { ...data, method: "UPDATE" } : data;
+        // Preparar datos para enviar
+        let res;
 
-        // Enviar a Facebook
-        const res = await fetch(
-            `https://graph.facebook.com/v21.0/${CATALOG}/products`,
-            {
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + TOKEN,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(requestData),
-            }
-        );
+        if (productExists) {
+            console.log(`🔄 Actualizando producto DIRECTAMENTE por ID: ${record.facebook_product_id}...`);
+            // Imprimir payload para debug
+            console.log("Payload Update:", JSON.stringify(data));
+
+            // Actualización directa al nodo del producto
+            res = await fetch(
+                `https://graph.facebook.com/v21.0/${record.facebook_product_id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + TOKEN,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data), // No necesitamos method: UPDATE aquí, ni retailer_id (ya lo tiene)
+                }
+            );
+        } else {
+            console.log(`✨ Creando producto NUEVO en catálogo...`);
+            // Creación en el catálogo
+            res = await fetch(
+                `https://graph.facebook.com/v21.0/${CATALOG}/products`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + TOKEN,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                }
+            );
+        }
 
         const fb = await res.json();
 
