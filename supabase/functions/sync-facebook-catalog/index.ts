@@ -179,15 +179,13 @@ serve(async (req) => {
                 const variantData: any = {
                     name: `${record.name} - ${variant.name || `Variante ${index + 1}`}`,
                     description: record.description || record.name,
-                    availability: variantAvailability,  // ✅ Se queda en data
-                    condition: record.condition || "new",  // ✅ Se queda en data
+                    condition: record.condition || "new",
                     price: Math.round(variantPrice * 100),
                     currency: "COP",
                     image_url: variantImageUrl,
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
                     product_type: categoryName
-                    // ❌ ELIMINADOS: item_group_id y google_product_category (van en la raíz)
                 };
 
                 // Agregar metadatos de catálogo opcionales
@@ -198,8 +196,14 @@ serve(async (req) => {
                     variantData.age_group = record.age_group;
                 }
 
-                // Atributos diferenciadores de la variante
-                if (variant.color) variantData.color = variant.color;
+                // ✅ DIFERENCIADORES OBLIGATORIOS - Facebook necesita al menos uno para agrupar
+                if (variant.color) {
+                    variantData.color = variant.color;
+                } else if (variant.name) {
+                    // Si no hay color, usar el nombre de la variante como diferenciador
+                    variantData.color = variant.name;
+                }
+
                 if (variant.size) variantData.size = variant.size;
                 if (variant.material) variantData.material = variant.material;
 
@@ -212,9 +216,10 @@ serve(async (req) => {
 
                 return {
                     method: "UPDATE",
-                    retailer_id: variantId,  // ID ÚNICO REAL
-                    item_group_id: record.id,  // ✅ En la raíz
-                    google_product_category: record.google_product_category || '512',  // ✅ En la raíz con default
+                    retailer_id: variantId,
+                    item_group_id: record.id,
+                    availability: variantAvailability,  // ✅ En la raíz (obligatorio)
+                    google_product_category: record.google_product_category || '512',  // ✅ En la raíz
                     style: variant.style || undefined,
                     data: variantData
                 };
@@ -231,15 +236,15 @@ serve(async (req) => {
                 const variantData: any = {
                     name: record.name,
                     description: record.description || record.name,
-                    availability: variantAvailability,  // ✅ Se queda en data
-                    condition: record.condition || "new",  // ✅ Se queda en data
+                    condition: record.condition || "new",
                     price: Math.round(record.price * 100),
                     currency: "COP",
                     image_url: imageUrl,  // Ya viene validada como HTTPS absoluta
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
-                    product_type: categoryName
-                    // ❌ ELIMINADOS: item_group_id y google_product_category (van en la raíz)
+                    product_type: categoryName,
+                    // ✅ DIFERENCIADOR: Usar el índice de vista como color para agrupar
+                    color: `Vista ${index + 1}`
                 };
 
                 // Agregar metadatos de catálogo opcionales
@@ -257,9 +262,10 @@ serve(async (req) => {
 
                 return {
                     method: "UPDATE",
-                    retailer_id: variantId,  // ID ÚNICO REAL
-                    item_group_id: record.id,  // ✅ En la raíz
-                    google_product_category: record.google_product_category || '512',  // ✅ En la raíz con default
+                    retailer_id: variantId,
+                    item_group_id: record.id,
+                    availability: variantAvailability,  // ✅ En la raíz (obligatorio)
+                    google_product_category: record.google_product_category || '512',  // ✅ En la raíz
                     style: `Vista ${index + 1}`,
                     data: variantData
                 };
