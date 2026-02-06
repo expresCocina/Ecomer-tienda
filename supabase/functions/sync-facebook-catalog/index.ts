@@ -177,6 +177,8 @@ serve(async (req) => {
                 variantImageUrl = ensureAbsoluteUrl(variantImageUrl);
 
                 const variantData: any = {
+                    id: variantId,  // ✅ DEBE SER IDÉNTICO AL retailer_id
+                    item_group_id: record.id,  // ✅ TAMBIÉN EN DATA
                     name: `${record.name} - ${variant.name || `Variante ${index + 1}`}`,
                     description: record.description || record.name,
                     condition: record.condition || "new",
@@ -214,15 +216,23 @@ serve(async (req) => {
                     variantData.sale_price = Math.round(record.offer_price * 100);
                 }
 
-                return {
+                // Construir objeto de respuesta
+                const batchItem: any = {
                     method: "UPDATE",
-                    retailer_id: variantId,
+                    retailer_id: variantId,  // ✅ IDÉNTICO A data.id
                     item_group_id: record.id,
-                    availability: variantAvailability,  // ✅ En la raíz (obligatorio)
-                    google_product_category: record.google_product_category || '512',  // ✅ En la raíz
-                    style: variant.style || undefined,
+                    availability: variantAvailability,
+                    inventory: variantStock || 0,  // ✅ AGREGAR STOCK NUMÉRICO EN RAÍZ
+                    google_product_category: record.google_product_category || '512',
                     data: variantData
                 };
+
+                // ✅ SOLO agregar style si tiene valor real (no undefined)
+                if (variant.style && variant.style.trim() !== '') {
+                    batchItem.style = variant.style;
+                }
+
+                return batchItem;
             });
         } else {
             // VARIANTES POR IMAGEN: Modelo actual (fallback)
@@ -234,6 +244,8 @@ serve(async (req) => {
                 const variantAvailability = record.stock > 0 ? "in stock" : "out of stock";
 
                 const variantData: any = {
+                    id: variantId,  // ✅ DEBE SER IDÉNTICO AL retailer_id
+                    item_group_id: record.id,  // ✅ TAMBIÉN EN DATA
                     name: record.name,
                     description: record.description || record.name,
                     condition: record.condition || "new",
@@ -262,11 +274,12 @@ serve(async (req) => {
 
                 return {
                     method: "UPDATE",
-                    retailer_id: variantId,
+                    retailer_id: variantId,  // ✅ IDÉNTICO A data.id
                     item_group_id: record.id,
-                    availability: variantAvailability,  // ✅ En la raíz (obligatorio)
-                    google_product_category: record.google_product_category || '512',  // ✅ En la raíz
-                    style: `Vista ${index + 1}`,
+                    availability: variantAvailability,
+                    inventory: record.stock || 0,  // ✅ AGREGAR STOCK NUMÉRICO EN RAÍZ
+                    google_product_category: record.google_product_category || '512',
+                    // ❌ NO agregar style aquí (no es necesario para variantes por imagen)
                     data: variantData
                 };
             });
