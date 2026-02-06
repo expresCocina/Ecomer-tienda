@@ -134,8 +134,6 @@ serve(async (req) => {
                 const variantPrice = variant.price || record.price;
 
                 const variantData: any = {
-                    id: variantId,  // ID dentro de data para forzar procesamiento
-                    item_group_id: record.id,  // Duplicado dentro de data
                     name: `${record.name} - ${variant.name || variant.value || `Variante ${index + 1}`}`,
                     description: record.description || record.name,
                     availability: (variant.stock || record.stock || 0) > 0 ? "in stock" : "out of stock",
@@ -148,11 +146,11 @@ serve(async (req) => {
                     product_type: categoryName,
                 };
 
-                // Mapear atributos dinámicos
+                // Mapear atributos dinámicos (solo los que NO están en la raíz)
                 if (variant.color) variantData.color = variant.color;
                 if (variant.size) variantData.size = variant.size;
                 if (variant.material) variantData.material = variant.material;
-                if (variant.style) variantData.style = variant.style;
+                // style va en la raíz, NO aquí
 
                 // Precio con descuento
                 const variantDiscount = variant.offer_price && variant.offer_price < variantPrice;
@@ -166,6 +164,7 @@ serve(async (req) => {
                     method: "UPDATE",
                     retailer_id: variantId,
                     item_group_id: record.id,
+                    style: variant.style || undefined,  // style en la raíz
                     data: variantData
                 };
             });
@@ -177,8 +176,6 @@ serve(async (req) => {
                 const variantId = `${record.id}_v${index + 1}`;
 
                 const variantData: any = {
-                    id: variantId,  // ID dentro de data
-                    item_group_id: record.id,  // Duplicado dentro de data
                     name: record.name,
                     description: record.description || record.name,
                     availability: record.stock > 0 ? "in stock" : "out of stock",
@@ -189,7 +186,6 @@ serve(async (req) => {
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
                     product_type: categoryName,
-                    style: `Vista ${index + 1}`,  // style en lugar de color
                 };
 
                 if (hasDiscount) {
@@ -200,6 +196,7 @@ serve(async (req) => {
                     method: "UPDATE",
                     retailer_id: variantId,
                     item_group_id: record.id,
+                    style: `Vista ${index + 1}`,  // style en la raíz
                     data: variantData
                 };
             });
