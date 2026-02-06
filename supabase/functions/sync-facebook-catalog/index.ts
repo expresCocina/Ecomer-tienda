@@ -179,17 +179,15 @@ serve(async (req) => {
                 const variantData: any = {
                     name: `${record.name} - ${variant.name || `Variante ${index + 1}`}`,
                     description: record.description || record.name,
-                    availability: variantAvailability,  // OBLIGATORIO en data
-                    condition: record.condition || "new",
+                    availability: variantAvailability,  // ✅ Se queda en data
+                    condition: record.condition || "new",  // ✅ Se queda en data
                     price: Math.round(variantPrice * 100),
                     currency: "COP",
                     image_url: variantImageUrl,
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
-                    product_type: categoryName,
-                    item_group_id: record.id,
-                    // CRÍTICO: google_product_category con default para relojes
-                    google_product_category: record.google_product_category || '512'
+                    product_type: categoryName
+                    // ❌ ELIMINADOS: item_group_id y google_product_category (van en la raíz)
                 };
 
                 // Agregar metadatos de catálogo opcionales
@@ -215,7 +213,8 @@ serve(async (req) => {
                 return {
                     method: "UPDATE",
                     retailer_id: variantId,  // ID ÚNICO REAL
-                    item_group_id: record.id,
+                    item_group_id: record.id,  // ✅ En la raíz
+                    google_product_category: record.google_product_category || '512',  // ✅ En la raíz con default
                     style: variant.style || undefined,
                     data: variantData
                 };
@@ -232,17 +231,15 @@ serve(async (req) => {
                 const variantData: any = {
                     name: record.name,
                     description: record.description || record.name,
-                    availability: variantAvailability,  // OBLIGATORIO en data
-                    condition: record.condition || "new",
+                    availability: variantAvailability,  // ✅ Se queda en data
+                    condition: record.condition || "new",  // ✅ Se queda en data
                     price: Math.round(record.price * 100),
                     currency: "COP",
                     image_url: imageUrl,  // Ya viene validada como HTTPS absoluta
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
-                    product_type: categoryName,
-                    item_group_id: record.id,
-                    // CRÍTICO: google_product_category con default para relojes
-                    google_product_category: record.google_product_category || '512'
+                    product_type: categoryName
+                    // ❌ ELIMINADOS: item_group_id y google_product_category (van en la raíz)
                 };
 
                 // Agregar metadatos de catálogo opcionales
@@ -261,7 +258,8 @@ serve(async (req) => {
                 return {
                     method: "UPDATE",
                     retailer_id: variantId,  // ID ÚNICO REAL
-                    item_group_id: record.id,
+                    item_group_id: record.id,  // ✅ En la raíz
+                    google_product_category: record.google_product_category || '512',  // ✅ En la raíz con default
                     style: `Vista ${index + 1}`,
                     data: variantData
                 };
