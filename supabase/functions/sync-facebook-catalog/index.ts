@@ -36,18 +36,26 @@ serve(async (req) => {
         // Obtener nombre de categoría
         let categoryName = "Sin categoría";
         if (record.category_id) {
-            const { data: category } = await supabase
+            console.log(`🔍 Buscando categoría con ID: ${record.category_id}`);
+            const { data: category, error: categoryError } = await supabase
                 .from("categories")
                 .select("name")
                 .eq("id", record.category_id)
                 .single();
 
-            if (category) {
+            if (categoryError) {
+                console.error(`❌ Error al obtener categoría:`, categoryError);
+            } else if (category) {
                 categoryName = category.name;
+                console.log(`✅ Categoría encontrada: ${categoryName}`);
+            } else {
+                console.log(`⚠️ Categoría no encontrada para ID: ${record.category_id}`);
             }
+        } else {
+            console.log(`⚠️ Producto sin category_id asignado`);
         }
 
-        console.log(`📁 Categoría: ${categoryName}`);
+        console.log(`📁 Categoría final: ${categoryName}`);
 
         // Filtrar y limpiar imágenes
         const allImages = (record.images || [])
@@ -114,69 +122,36 @@ serve(async (req) => {
         // Log del payload completo para debugging
         console.log(`📋 PAYLOAD COMPLETO:`, JSON.stringify(data, null, 2));
 
-        console.log(`📦 Sincronizando producto con Facebook...`);
+        console.log(`📦 Sincronizando producto con Facebook usando Batch API...`);
 
-        // Estrategia: LIMPIAR IMÁGENES + ACTUALIZAR
-        // Esta estrategia PRESERVA el ID del producto (no rompe anuncios)
-        // 1. Si el producto existe, primero limpiamos las imágenes adicionales
-        // 2. Luego actualizamos con todos los datos incluyendo las imágenes correctas
+        // BATCH API: La forma correcta de actualizar productos preservando anuncios
+        // Usamos el Batch API con method: "UPDATE" y requests array
 
-        let res;
-        let fb;
+        const batchRequest = {
+            method: "UPDATE",
+            retailer_id: record.id,
+            data: data
+        };
 
-        if (record.facebook_product_id) {
-            console.log(`🧹 Limpiando imágenes adicionales del producto (ID: ${record.facebook_product_id})...`);
+        console.log(`📋 Batch Request:`, JSON.stringify(batchRequest, null, 2));
 
-            // Paso 1: Limpiar imágenes adicionales enviando array vacío
-            try {
-                const cleanRes = await fetch(
-                    `https://graph.facebook.com/v21.0/${record.facebook_product_id}`,
-                    {
-                        method: "POST",
-                        headers: {
-                            "Authorization": "Bearer " + TOKEN,
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ additional_image_link: [] })
-                    }
-                );
-                const cleanResult = await cleanRes.json();
-                console.log(cleanRes.ok ? `✅ Imágenes adicionales limpiadas` : `⚠️ Limpieza: ${JSON.stringify(cleanResult)}`);
-            } catch (cleanErr) {
-                console.log(`⚠️ Error al limpiar imágenes (continuando): ${cleanErr}`);
+        const res = await fetch(
+            `https://graph.facebook.com/v21.0/${CATALOG}/batch`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + TOKEN,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    requests: [batchRequest]
+                }),
             }
+        );
 
-            // Paso 2: Actualizar producto con todos los datos (incluyendo imágenes nuevas)
-            console.log(`🔄 Actualizando producto existente...`);
-            res = await fetch(
-                `https://graph.facebook.com/v21.0/${record.facebook_product_id}`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + TOKEN,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(data),
-                }
-            );
-            fb = await res.json();
-        } else {
-            // Producto nuevo: crear en el catálogo
-            console.log(`✨ Creando producto nuevo en Facebook...`);
-            res = await fetch(
-                `https://graph.facebook.com/v21.0/${CATALOG}/products`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + TOKEN,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(data),
-                }
-            );
-            fb = await res.json();
-        }
+        const fb = await res.json();
 
+        console.log(`📤 Respuesta de Facebook:`, JSON.stringify(fb, null, 2));
 
 
         if (!res.ok) {
