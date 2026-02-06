@@ -135,10 +135,13 @@ serve(async (req) => {
                 const variantAvailability = (variant.stock || record.stock || 0) > 0 ? "in stock" : "out of stock";
 
                 const variantData: any = {
+                    id: variantId,  // ID obligatorio dentro de data
+                    item_group_id: record.id,  // Duplicado dentro de data
                     name: `${record.name} - ${variant.name || variant.value || `Variante ${index + 1}`}`,
                     description: record.description || record.name,
+                    availability: variantAvailability,  // Obligatorio dentro de data
                     condition: "new",
-                    price: Math.round(variantPrice * 100),  // Número puro
+                    price: Math.round(variantPrice * 100),
                     currency: "COP",
                     image_url: variant.image || allImages[index] || mainImage,
                     url: `${SITE}/producto/${record.id}`,
@@ -146,10 +149,11 @@ serve(async (req) => {
                     product_type: categoryName,
                 };
 
-                // Mapear atributos dinámicos (solo los que NO están en la raíz)
+                // Atributos diferenciadores (obligatorios para agrupamiento)
                 if (variant.color) variantData.color = variant.color;
                 if (variant.size) variantData.size = variant.size;
                 if (variant.material) variantData.material = variant.material;
+                if (variant.style) variantData.style = variant.style;
 
                 // Precio con descuento
                 const variantDiscount = variant.offer_price && variant.offer_price < variantPrice;
@@ -162,9 +166,7 @@ serve(async (req) => {
                 return {
                     method: "UPDATE",
                     retailer_id: variantId,
-                    item_group_id: record.id,
-                    availability: variantAvailability,  // availability en la raíz
-                    style: variant.style || undefined,
+                    item_group_id: record.id,  // También en la raíz para agrupamiento
                     data: variantData
                 };
             });
@@ -177,15 +179,19 @@ serve(async (req) => {
                 const variantAvailability = record.stock > 0 ? "in stock" : "out of stock";
 
                 const variantData: any = {
+                    id: variantId,  // ID obligatorio dentro de data
+                    item_group_id: record.id,  // Duplicado dentro de data
                     name: record.name,
                     description: record.description || record.name,
+                    availability: variantAvailability,  // Obligatorio dentro de data
                     condition: "new",
-                    price: Math.round(record.price * 100),  // Número puro
+                    price: Math.round(record.price * 100),
                     currency: "COP",
                     image_url: imageUrl,
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
                     product_type: categoryName,
+                    style: `Vista ${index + 1}`,  // Diferenciador visual
                 };
 
                 if (hasDiscount) {
@@ -195,9 +201,7 @@ serve(async (req) => {
                 return {
                     method: "UPDATE",
                     retailer_id: variantId,
-                    item_group_id: record.id,
-                    availability: variantAvailability,  // availability en la raíz
-                    style: `Vista ${index + 1}`,
+                    item_group_id: record.id,  // También en la raíz para agrupamiento
                     data: variantData
                 };
             });
