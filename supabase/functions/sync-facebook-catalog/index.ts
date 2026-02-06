@@ -57,9 +57,31 @@ serve(async (req) => {
 
         console.log(`📁 Categoría final: ${categoryName}`);
 
-        // Filtrar y limpiar imágenes
+        // Helper: Asegurar que las URLs sean absolutas con HTTPS
+        const ensureAbsoluteUrl = (url: string): string => {
+            if (!url) return "";
+
+            // Si ya es una URL absoluta, retornarla
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                return url;
+            }
+
+            // Si es una ruta de Supabase Storage, construir URL completa
+            // Formato esperado: /storage/v1/object/public/...
+            if (url.startsWith("/storage/")) {
+                return `${SUPABASE_URL}${url}`;
+            }
+
+            // Si es solo el path del bucket, construir URL completa
+            // Formato: product-images/abc123.jpg
+            return `${SUPABASE_URL}/storage/v1/object/public/${url}`;
+        };
+
+        // Filtrar, limpiar y validar imágenes
         const allImages = (record.images || [])
             .filter((url: string) => url && url.trim() !== "")
+            .map((url: string) => ensureAbsoluteUrl(url))
+            .filter((url: string) => url.startsWith("https://")) // Solo HTTPS válidas
             .filter((url: string, index: number, self: string[]) => self.indexOf(url) === index);
 
         console.log(`📸 Total de imágenes únicas: ${allImages.length}`);
@@ -144,28 +166,33 @@ serve(async (req) => {
             console.log(`✅ Producto con ${record.variants.length} variantes reales`);
 
             batchRequests = record.variants.map((variant: any, index: number) => {
-                const variantId = variant.id || `${record.id}_v${index + 1}`;
+                // CRÍTICO: Usar ID único real, no genérico
+                const variantId = variant.id || `${record.id}_var_${index + 1}_${Date.now()}`;
                 const variantPrice = variant.price || record.price;
-                const variantAvailability = (variant.stock || record.stock || 0) > 0 ? "in stock" : "out of stock";
+                const variantStock = variant.stock !== undefined ? variant.stock : record.stock;
+                const variantAvailability = (variantStock || 0) > 0 ? "in stock" : "out of stock";
+
+                // Asegurar que la imagen de la variante sea URL absoluta
+                let variantImageUrl = variant.image_url || allImages[index] || mainImage;
+                variantImageUrl = ensureAbsoluteUrl(variantImageUrl);
 
                 const variantData: any = {
                     name: `${record.name} - ${variant.name || `Variante ${index + 1}`}`,
                     description: record.description || record.name,
-                    availability: variantAvailability,
+                    availability: variantAvailability,  // OBLIGATORIO en data
                     condition: record.condition || "new",
                     price: Math.round(variantPrice * 100),
                     currency: "COP",
-                    image_url: variant.image_url || allImages[index] || mainImage,
+                    image_url: variantImageUrl,
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
                     product_type: categoryName,
-                    item_group_id: record.id,  // CRÍTICO: item_group_id también en data
+                    item_group_id: record.id,
+                    // CRÍTICO: google_product_category con default para relojes
+                    google_product_category: record.google_product_category || '512'
                 };
 
-                // Agregar metadatos de catálogo del producto
-                if (record.google_product_category) {
-                    variantData.google_product_category = record.google_product_category;
-                }
+                // Agregar metadatos de catálogo opcionales
                 if (record.gender) {
                     variantData.gender = record.gender;
                 }
@@ -187,7 +214,7 @@ serve(async (req) => {
 
                 return {
                     method: "UPDATE",
-                    retailer_id: variantId,
+                    retailer_id: variantId,  // ID ÚNICO REAL
                     item_group_id: record.id,
                     style: variant.style || undefined,
                     data: variantData
@@ -198,27 +225,27 @@ serve(async (req) => {
             console.log(`📸 Sin variantes reales, creando ${allImages.length} variantes por imagen`);
 
             batchRequests = allImages.map((imageUrl: string, index: number) => {
-                const variantId = `${record.id}_v${index + 1}`;
+                // CRÍTICO: Usar ID único real
+                const variantId = `${record.id}_img_${index + 1}_${Date.now()}`;
                 const variantAvailability = record.stock > 0 ? "in stock" : "out of stock";
 
                 const variantData: any = {
                     name: record.name,
                     description: record.description || record.name,
-                    availability: variantAvailability,
+                    availability: variantAvailability,  // OBLIGATORIO en data
                     condition: record.condition || "new",
                     price: Math.round(record.price * 100),
                     currency: "COP",
-                    image_url: imageUrl,
+                    image_url: imageUrl,  // Ya viene validada como HTTPS absoluta
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
                     product_type: categoryName,
-                    item_group_id: record.id,  // CRÍTICO: item_group_id también en data
+                    item_group_id: record.id,
+                    // CRÍTICO: google_product_category con default para relojes
+                    google_product_category: record.google_product_category || '512'
                 };
 
-                // Agregar metadatos de catálogo
-                if (record.google_product_category) {
-                    variantData.google_product_category = record.google_product_category;
-                }
+                // Agregar metadatos de catálogo opcionales
                 if (record.gender) {
                     variantData.gender = record.gender;
                 }
@@ -233,7 +260,7 @@ serve(async (req) => {
 
                 return {
                     method: "UPDATE",
-                    retailer_id: variantId,
+                    retailer_id: variantId,  // ID ÚNICO REAL
                     item_group_id: record.id,
                     style: `Vista ${index + 1}`,
                     data: variantData
