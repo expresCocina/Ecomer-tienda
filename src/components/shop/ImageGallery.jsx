@@ -41,13 +41,13 @@ export const ImageGallery = ({ images = [], alt = 'Product' }) => {
                     <>
                         <button
                             onClick={goToPrevious}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                         >
                             <ChevronLeft className="w-6 h-6" />
                         </button>
                         <button
                             onClick={goToNext}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                         >
                             <ChevronRight className="w-6 h-6" />
                         </button>

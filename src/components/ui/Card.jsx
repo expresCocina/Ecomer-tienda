@@ -1,7 +1,7 @@
 import { cn } from '../../lib/utils';
 
 /**
- * Componente Card reutilizable - Tema oscuro/dorado
+ * Componente Card reutilizable - Tema limpio con acentos dorados
  */
 export const Card = ({
     children,
@@ -12,8 +12,8 @@ export const Card = ({
     return (
         <div
             className={cn(
-                'bg-primary-800/50 backdrop-blur-sm rounded-xl shadow-md shadow-gold-500/10 border-2 border-gold-500/20',
-                hover && 'transition-all duration-200 hover:shadow-lg hover:shadow-gold-500/20 hover:-translate-y-1 hover:border-gold-500/30',
+                'bg-white rounded-xl shadow-lg border border-gray-200/80 overflow-hidden',
+                hover && 'transition-all duration-300 hover:shadow-xl hover:shadow-gold-500/10 hover:-translate-y-0.5 hover:border-gold-500/30',
                 className
             )}
             {...props}
@@ -24,33 +24,33 @@ export const Card = ({
 };
 
 /**
- * Card Header - Tema oscuro/dorado
+ * Card Header - Tema limpio con acento dorado
  */
 export const CardHeader = ({ children, className = '', ...props }) => {
     return (
-        <div className={cn('mobile-padding py-4 sm:py-5 border-b-2 border-gold-500/20', className)} {...props}>
+        <div className={cn('mobile-padding py-5 border-b border-gold-500/20 bg-gradient-to-r from-gray-50/50 to-transparent', className)} {...props}>
             {children}
         </div>
     );
 };
 
 /**
- * Card Body - Tema oscuro/dorado
+ * Card Body - Tema limpio
  */
 export const CardBody = ({ children, className = '', ...props }) => {
     return (
-        <div className={cn('mobile-padding py-4 sm:py-5', className)} {...props}>
+        <div className={cn('mobile-padding py-6', className)} {...props}>
             {children}
         </div>
     );
 };
 
 /**
- * Card Footer - Tema oscuro/dorado
+ * Card Footer - Tema limpio con acento dorado
  */
 export const CardFooter = ({ children, className = '', ...props }) => {
     return (
-        <div className={cn('mobile-padding py-4 sm:py-5 border-t-2 border-gold-500/20 bg-primary-900/50 backdrop-blur-sm rounded-b-xl', className)} {...props}>
+        <div className={cn('mobile-padding py-5 border-t border-gold-500/20 bg-gradient-to-r from-gray-50/50 to-transparent rounded-b-xl', className)} {...props}>
             {children}
         </div>
     );

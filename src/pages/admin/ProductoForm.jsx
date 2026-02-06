@@ -89,12 +89,22 @@ export const ProductoForm = () => {
 
             // Cargar variantes: si es array, es el nuevo formato, si es objeto, es el viejo
             if (Array.isArray(product.variants)) {
-                setVariantCombinations(product.variants);
-                // Reconstruir variantTypes desde las combinaciones
+                // Mapear claves singulares (DB) a plurales (UI)
+                const mappedVariants = product.variants.map(v => ({
+                    ...v,
+                    colors: v.color || v.colors, // Fallback por si ya tiene plural
+                    sizes: v.size || v.sizes,
+                    materials: v.material || v.materials,
+                    styles: v.style || v.styles
+                }));
+
+                setVariantCombinations(mappedVariants);
+
+                // Reconstruir variantTypes desde las combinaciones mapeadas
                 const types = {};
-                product.variants.forEach(v => {
-                    Object.keys(v).forEach(key => {
-                        if (['colors', 'sizes', 'materials', 'styles'].includes(key) && v[key]) {
+                mappedVariants.forEach(v => {
+                    ['colors', 'sizes', 'materials', 'styles'].forEach(key => {
+                        if (v[key]) {
                             if (!types[key]) types[key] = [];
                             if (!types[key].includes(v[key])) {
                                 types[key].push(v[key]);
@@ -186,6 +196,27 @@ export const ProductoForm = () => {
             // Combinar imágenes existentes con nuevas
             const allImages = [...existingImages, ...uploadedImageUrls];
 
+            // Variantes (JSONB limpio)
+            // DEBUG: Verificar combinaciones antes de guardar
+            const variantsToSave = variantCombinations.length > 0 ? variantCombinations.map(v => ({
+                id: v.id,
+                sku: v.sku || null,
+                name: v.name,
+                price: parseFloat(v.price),
+                offer_price: v.offer_price ? parseFloat(v.offer_price) : null,
+                stock: parseInt(v.stock),
+                image_url: v.image_url || null,
+                color: v.colors || null,
+                size: v.sizes || null,
+                material: v.materials || null,
+                style: v.styles || null
+            })) : null;
+
+            console.log('Guardando producto:', {
+                ...formData,
+                variants: variantsToSave
+            });
+
             // Preparar datos limpios
             const productData = {
                 name: formData.name,
@@ -209,20 +240,7 @@ export const ProductoForm = () => {
                 brand: formData.brand || null,
                 material: formData.material || null,
 
-                // Variantes (JSONB limpio)
-                variants: variantCombinations.length > 0 ? variantCombinations.map(v => ({
-                    id: v.id,
-                    sku: v.sku || null,
-                    name: v.name,
-                    price: parseFloat(v.price),
-                    offer_price: v.offer_price ? parseFloat(v.offer_price) : null,
-                    stock: parseInt(v.stock),
-                    image_url: v.image_url || null,
-                    color: v.colors || null,
-                    size: v.sizes || null,
-                    material: v.materials || null,
-                    style: v.styles || null
-                })) : null,
+                variants: variantsToSave,
             };
 
             let savedProductId = id;
@@ -260,25 +278,24 @@ export const ProductoForm = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-            {/* Header con gradiente dorado */}
-            <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 shadow-lg">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 shadow-2xl border-b-4 border-gold-500">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <button
                         onClick={() => navigate('/admin/inventario')}
-                        className="flex items-center text-gold-300 hover:text-gold-100 mb-4 transition-colors group"
-                    >
+                        className="group flex items-center text-gold-300 hover:text-gold-100 transition-all duration-200 mb-4 hover:scale-105">
                         <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
                         Volver al inventario
                     </button>
                     <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-gold-500 via-gold-600 to-gold-700 rounded-xl flex items-center justify-center shadow-lg shadow-gold-500/30">
-                            <Watch className="w-7 h-7 text-primary-900" />
+                        <div className="w-16 h-16 bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-gold-500/50 ring-4 ring-gold-500/20">
+                            <Watch className="w-8 h-8 text-primary-900" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-display font-bold text-white">
+                            <h1 className="text-3xl font-display font-bold text-white drop-shadow-lg">
                                 {isEditing ? 'Editar Producto' : 'Nuevo Producto'}
                             </h1>
-                            <p className="text-gold-300 text-sm mt-1">
+                            <p className="text-gold-200 text-sm mt-1 font-medium">
                                 {isEditing ? 'Actualiza la información del reloj' : 'Agrega un nuevo reloj a tu inventario'}
                             </p>
                         </div>
@@ -287,7 +304,7 @@ export const ProductoForm = () => {
             </div>
 
             {/* Formulario */}
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-6">
                         {/* Información básica */}
@@ -353,8 +370,8 @@ export const ProductoForm = () => {
                         <Card>
                             <CardHeader>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                                        <DollarSign className="w-5 h-5 text-white" />
+                                    <div className="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center shadow-lg">
+                                        <DollarSign className="w-5 h-5 text-primary-900" />
                                     </div>
                                     <div>
                                         <h2 className="text-lg font-semibold text-gray-900">Precios y Stock</h2>
@@ -407,8 +424,8 @@ export const ProductoForm = () => {
                         <Card>
                             <CardHeader>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <ImageIcon className="w-5 h-5 text-white" />
+                                    <div className="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center shadow-lg">
+                                        <ImageIcon className="w-5 h-5 text-primary-900" />
                                     </div>
                                     <div>
                                         <h2 className="text-lg font-semibold text-gray-900">Imágenes</h2>
@@ -489,10 +506,15 @@ export const ProductoForm = () => {
                         {/* Variantes */}
                         <Card>
                             <CardHeader>
-                                <h2 className="text-lg font-semibold">Variantes del Producto</h2>
-                                <p className="text-sm text-gray-500 mt-1">
-                                    Configura opciones como tallas, colores, materiales, etc.
-                                </p>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center shadow-lg">
+                                        <Package className="w-5 h-5 text-primary-900" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-semibold text-gray-900">Variantes del Producto</h2>
+                                        <p className="text-sm text-gray-500">Configura opciones como tallas, colores, materiales, etc.</p>
+                                    </div>
+                                </div>
                             </CardHeader>
                             <CardBody>
                                 <VariantEditor
@@ -507,6 +529,10 @@ export const ProductoForm = () => {
                                         combinations={variantCombinations}
                                         onChange={setVariantCombinations}
                                         productBrand={formData.brand}
+                                        availableImages={[...existingImages, ...images]}
+                                        basePrice={formData.price}
+                                        baseOfferPrice={formData.offer_price}
+                                        baseStock={formData.stock}
                                     />
                                 )}
                             </CardBody>
@@ -550,8 +576,8 @@ export const ProductoForm = () => {
                         <Card>
                             <CardHeader>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                        <Settings className="w-5 h-5 text-white" />
+                                    <div className="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center shadow-lg">
+                                        <Settings className="w-5 h-5 text-primary-900" />
                                     </div>
                                     <div>
                                         <h2 className="text-lg font-semibold text-gray-900">Opciones</h2>

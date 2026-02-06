@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Trash2, AlertCircle } from 'lucide-react';
-import { ImageUploader } from '../ui/ImageUploader';
+import { ImageSelector } from './ImageSelector';
 import { SyncStatusBadge } from './SyncStatusBadge';
 import { Input } from '../ui/Input';
 
@@ -10,12 +10,20 @@ import { Input } from '../ui/Input';
  * @param {array} combinations - Array de combinaciones actuales
  * @param {function} onChange - Callback cuando cambian las combinaciones
  * @param {string} productBrand - Marca del producto
+ * @param {array} availableImages - Imágenes disponibles del producto
+ * @param {number} basePrice - Precio base del producto
+ * @param {number} baseOfferPrice - Precio de oferta base del producto
+ * @param {number} baseStock - Stock base del producto
  */
 export const VariantCombinationTable = ({
     variantTypes = {},
     combinations = [],
     onChange,
-    productBrand
+    productBrand,
+    availableImages = [],
+    basePrice = '',
+    baseOfferPrice = '',
+    baseStock = 0
 }) => {
     const [localCombinations, setLocalCombinations] = useState(combinations);
 
@@ -37,8 +45,12 @@ export const VariantCombinationTable = ({
                     // Crear ID único para la combinación
                     const id = `var_${Object.values(current).join('_').toLowerCase().replace(/\s+/g, '_')}`;
 
-                    // Buscar si ya existe esta combinación
-                    const existing = localCombinations.find(c => c.id === id);
+                    // Buscar si ya existe esta combinación (en local o en props)
+                    // 1. Por ID exacto
+                    // 2. Por coincidencia de atributos (fallback por si el ID cambia por orden de claves)
+                    const existing = localCombinations.find(c => c.id === id) ||
+                        combinations.find(c => c.id === id) ||
+                        combinations.find(c => Object.keys(current).every(k => c[k] === current[k]));
 
                     // Crear nombre descriptivo
                     const name = Object.values(current).join(' - ');
@@ -47,9 +59,9 @@ export const VariantCombinationTable = ({
                         id,
                         sku: existing?.sku || '',
                         name: existing?.name || name,
-                        price: existing?.price || '',
-                        offer_price: existing?.offer_price || '',
-                        stock: existing?.stock || 0,
+                        price: existing?.price || basePrice || '',
+                        offer_price: existing?.offer_price || baseOfferPrice || '',
+                        stock: existing?.stock !== undefined ? existing.stock : (baseStock || 0),
                         image_url: existing?.image_url || '',
                         ...current
                     });
@@ -146,7 +158,8 @@ export const VariantCombinationTable = ({
                             <tr key={combination.id} className="hover:bg-gray-50">
                                 {/* Imagen */}
                                 <td className="px-4 py-3">
-                                    <ImageUploader
+                                    <ImageSelector
+                                        availableImages={availableImages}
                                         value={combination.image_url}
                                         onChange={(url) => handleCombinationChange(index, 'image_url', url)}
                                     />

@@ -138,9 +138,86 @@ export const ProductDetail = () => {
         }
     };
 
+    // Helper para extraer tipos de variantes desde el array de combinaciones
+    const getVariantTypes = (variants) => {
+        if (!variants || !Array.isArray(variants) || variants.length === 0) {
+            return {};
+        }
+
+        const types = {};
+        // Mapa de singular (DB/Facebook) a plural (UI)
+        const fieldMap = {
+            'color': 'colors',
+            'colors': 'colors',
+            'size': 'sizes',
+            'sizes': 'sizes',
+            'material': 'materials',
+            'materials': 'materials',
+            'style': 'styles',
+            'styles': 'styles'
+        };
+
+        variants.forEach(variant => {
+            Object.keys(fieldMap).forEach(sourceKey => {
+                if (variant[sourceKey]) {
+                    const targetKey = fieldMap[sourceKey];
+                    if (!types[targetKey]) {
+                        types[targetKey] = [];
+                    }
+                    if (!types[targetKey].includes(variant[sourceKey])) {
+                        types[targetKey].push(variant[sourceKey]);
+                    }
+                }
+            });
+        });
+
+        return types;
+    };
+
+    // Helper para obtener la imagen de una variante específica
+    const getVariantImage = (variants, selectedVariants) => {
+        if (!variants || !Array.isArray(variants) || variants.length === 0) {
+            return null;
+        }
+
+        // Buscar la variante que coincida con la selección
+        const matchingVariant = variants.find(variant => {
+            // Verificar si todas las selecciones coinciden
+            return Object.keys(selectedVariants).every(key => {
+                // key es singular (color, size) porque viene de variantTypeMap o del VariantSelector
+
+                // Intentar encontrar el valor en la variante usando singular o plural
+                const variantValue = variant[key] || variant[key + 's'];
+
+                return variantValue === selectedVariants[key];
+            });
+        });
+
+        return matchingVariant?.image_url || null;
+    };
+
+    // Efecto para cambiar imagen cuando se selecciona una variante
+    useEffect(() => {
+        if (product && product.variants && selectedVariants) {
+            const variantImage = getVariantImage(product.variants, selectedVariants);
+            if (variantImage) {
+                // Actualizar la galería para mostrar la imagen de la variante
+                // Esto se puede hacer actualizando el producto con la imagen de la variante al inicio
+                const updatedProduct = {
+                    ...product,
+                    images: [variantImage, ...(product.images || []).filter(img => img !== variantImage)]
+                };
+                setProduct(updatedProduct);
+            }
+        }
+    }, [selectedVariants]);
+
     const handleAddToCart = () => {
+        // Extraer tipos de variantes desde el array
+        const variantTypes = getVariantTypes(product.variants);
+
         // Validar si el producto tiene variantes y si están seleccionadas
-        if (product.variants && Object.keys(product.variants).length > 0) {
+        if (variantTypes && Object.keys(variantTypes).length > 0) {
             // Mapear tipos de variantes (plural) a claves de selección (singular)
             const variantTypeMap = {
                 'sizes': 'size',
@@ -149,7 +226,7 @@ export const ProductDetail = () => {
                 'styles': 'style'
             };
 
-            const requiredVariants = Object.keys(product.variants);
+            const requiredVariants = Object.keys(variantTypes);
             const missingVariants = requiredVariants.filter(type => {
                 const selectionKey = variantTypeMap[type] || type;
                 return !selectedVariants[selectionKey];
@@ -297,8 +374,8 @@ export const ProductDetail = () => {
 
                         {/* Descripción */}
                         {product.description && (
-                            <Card className="mb-6 bg-primary-800/50 border-gold-500/20">
-                                <CardBody>
+                            <div className="mb-6 bg-primary-800/50 border border-gold-500/20 rounded-xl overflow-hidden shadow-lg">
+                                <div className="p-6">
                                     <div className="flex items-start gap-3">
                                         <Info className="w-5 h-5 text-gold-400 flex-shrink-0 mt-0.5" />
                                         <div className="w-full">
@@ -318,8 +395,8 @@ export const ProductDetail = () => {
                                             </div>
                                         </div>
                                     </div>
-                                </CardBody>
-                            </Card>
+                                </div>
+                            </div>
                         )}
 
                         {/* Tags */}
@@ -336,15 +413,18 @@ export const ProductDetail = () => {
                         )}
 
                         {/* Selector de Variantes */}
-                        {product.variants && Object.keys(product.variants).length > 0 && (
-                            <div className="mb-6">
-                                <VariantSelector
-                                    variants={product.variants}
-                                    selected={selectedVariants}
-                                    onChange={setSelectedVariants}
-                                />
-                            </div>
-                        )}
+                        {(() => {
+                            const variantTypes = getVariantTypes(product.variants);
+                            return variantTypes && Object.keys(variantTypes).length > 0 && (
+                                <div className="mb-6">
+                                    <VariantSelector
+                                        variants={variantTypes}
+                                        selected={selectedVariants}
+                                        onChange={setSelectedVariants}
+                                    />
+                                </div>
+                            );
+                        })()}
 
                         {/* Selector de cantidad */}
                         {inStock && (
