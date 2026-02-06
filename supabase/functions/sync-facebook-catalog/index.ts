@@ -132,14 +132,14 @@ serve(async (req) => {
             batchRequests = record.variants.map((variant: any, index: number) => {
                 const variantId = variant.id || `${record.id}_v${index + 1}`;
                 const variantPrice = variant.price || record.price;
+                const variantAvailability = (variant.stock || record.stock || 0) > 0 ? "in stock" : "out of stock";
 
                 const variantData: any = {
                     name: `${record.name} - ${variant.name || variant.value || `Variante ${index + 1}`}`,
                     description: record.description || record.name,
-                    availability: (variant.stock || record.stock || 0) > 0 ? "in stock" : "out of stock",
                     condition: "new",
                     price: Math.round(variantPrice * 100),  // Número puro
-                    currency: "COP",  // Moneda por separado
+                    currency: "COP",
                     image_url: variant.image || allImages[index] || mainImage,
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
@@ -150,21 +150,21 @@ serve(async (req) => {
                 if (variant.color) variantData.color = variant.color;
                 if (variant.size) variantData.size = variant.size;
                 if (variant.material) variantData.material = variant.material;
-                // style va en la raíz, NO aquí
 
                 // Precio con descuento
                 const variantDiscount = variant.offer_price && variant.offer_price < variantPrice;
                 if (variantDiscount) {
-                    variantData.sale_price = Math.round(variant.offer_price * 100);  // Número puro
+                    variantData.sale_price = Math.round(variant.offer_price * 100);
                 } else if (hasDiscount) {
-                    variantData.sale_price = Math.round(record.offer_price * 100);  // Número puro
+                    variantData.sale_price = Math.round(record.offer_price * 100);
                 }
 
                 return {
                     method: "UPDATE",
                     retailer_id: variantId,
                     item_group_id: record.id,
-                    style: variant.style || undefined,  // style en la raíz
+                    availability: variantAvailability,  // availability en la raíz
+                    style: variant.style || undefined,
                     data: variantData
                 };
             });
@@ -174,14 +174,14 @@ serve(async (req) => {
 
             batchRequests = allImages.map((imageUrl: string, index: number) => {
                 const variantId = `${record.id}_v${index + 1}`;
+                const variantAvailability = record.stock > 0 ? "in stock" : "out of stock";
 
                 const variantData: any = {
                     name: record.name,
                     description: record.description || record.name,
-                    availability: record.stock > 0 ? "in stock" : "out of stock",
                     condition: "new",
                     price: Math.round(record.price * 100),  // Número puro
-                    currency: "COP",  // Moneda por separado
+                    currency: "COP",
                     image_url: imageUrl,
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
@@ -189,14 +189,15 @@ serve(async (req) => {
                 };
 
                 if (hasDiscount) {
-                    variantData.sale_price = Math.round(record.offer_price * 100);  // Número puro
+                    variantData.sale_price = Math.round(record.offer_price * 100);
                 }
 
                 return {
                     method: "UPDATE",
                     retailer_id: variantId,
                     item_group_id: record.id,
-                    style: `Vista ${index + 1}`,  // style en la raíz
+                    availability: variantAvailability,  // availability en la raíz
+                    style: `Vista ${index + 1}`,
                     data: variantData
                 };
             });
