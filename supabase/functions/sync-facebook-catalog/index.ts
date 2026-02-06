@@ -152,13 +152,14 @@ serve(async (req) => {
                     name: `${record.name} - ${variant.name || `Variante ${index + 1}`}`,
                     description: record.description || record.name,
                     availability: variantAvailability,
-                    condition: record.condition || "new",  // Usar condición del producto
+                    condition: record.condition || "new",
                     price: Math.round(variantPrice * 100),
                     currency: "COP",
                     image_url: variant.image_url || allImages[index] || mainImage,
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
                     product_type: categoryName,
+                    item_group_id: record.id,  // CRÍTICO: item_group_id también en data
                 };
 
                 // Agregar metadatos de catálogo del producto
@@ -176,13 +177,11 @@ serve(async (req) => {
                 if (variant.color) variantData.color = variant.color;
                 if (variant.size) variantData.size = variant.size;
                 if (variant.material) variantData.material = variant.material;
-                // style va en la raíz, NO en data
 
-                // Precio con descuento
-                const variantDiscount = variant.offer_price && variant.offer_price < variantPrice;
-                if (variantDiscount) {
+                // Precio con descuento - SOLO si offer_price > 0
+                if (variant.offer_price && variant.offer_price > 0 && variant.offer_price < variantPrice) {
                     variantData.sale_price = Math.round(variant.offer_price * 100);
-                } else if (hasDiscount) {
+                } else if (record.offer_price && record.offer_price > 0 && record.offer_price < record.price) {
                     variantData.sale_price = Math.round(record.offer_price * 100);
                 }
 
@@ -190,7 +189,7 @@ serve(async (req) => {
                     method: "UPDATE",
                     retailer_id: variantId,
                     item_group_id: record.id,
-                    style: variant.style || undefined,  // style en la raíz para diferenciación
+                    style: variant.style || undefined,
                     data: variantData
                 };
             });
@@ -206,16 +205,29 @@ serve(async (req) => {
                     name: record.name,
                     description: record.description || record.name,
                     availability: variantAvailability,
-                    condition: "new",
+                    condition: record.condition || "new",
                     price: Math.round(record.price * 100),
                     currency: "COP",
                     image_url: imageUrl,
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
                     product_type: categoryName,
+                    item_group_id: record.id,  // CRÍTICO: item_group_id también en data
                 };
 
-                if (hasDiscount) {
+                // Agregar metadatos de catálogo
+                if (record.google_product_category) {
+                    variantData.google_product_category = record.google_product_category;
+                }
+                if (record.gender) {
+                    variantData.gender = record.gender;
+                }
+                if (record.age_group) {
+                    variantData.age_group = record.age_group;
+                }
+
+                // Precio con descuento - SOLO si offer_price > 0
+                if (record.offer_price && record.offer_price > 0 && record.offer_price < record.price) {
                     variantData.sale_price = Math.round(record.offer_price * 100);
                 }
 
@@ -223,7 +235,7 @@ serve(async (req) => {
                     method: "UPDATE",
                     retailer_id: variantId,
                     item_group_id: record.id,
-                    style: `Vista ${index + 1}`,  // style en la raíz
+                    style: `Vista ${index + 1}`,
                     data: variantData
                 };
             });
