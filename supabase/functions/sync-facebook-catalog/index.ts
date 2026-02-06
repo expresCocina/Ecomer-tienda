@@ -118,16 +118,42 @@ serve(async (req) => {
         // Log del payload completo para debugging
         console.log(`📋 PAYLOAD COMPLETO:`, JSON.stringify(data, null, 2));
 
-        console.log(`📦 Sincronizando producto con Facebook usando Batch API...`);
+        console.log(`📦 Sincronizando producto con Facebook usando Modelo Parent-Child...`);
 
-        // BATCH API: retailer_id va FUERA de data, al mismo nivel que method
-        const batchRequest = {
-            method: "UPDATE",
-            retailer_id: record.id,
-            data: data
-        };
+        // MODELO PARENT-CHILD: Crear una variante por cada imagen
+        // Todas las variantes comparten el mismo item_group_id (ID del producto)
+        // Cada variante tiene un retailer_id único: ID_v1, ID_v2, etc.
 
-        console.log(`📋 Batch Request:`, JSON.stringify(batchRequest, null, 2));
+        const batchRequests = allImages.map((imageUrl: string, index: number) => {
+            const variantData: any = {
+                item_group_id: record.id,  // El "pegamento" que une todas las variantes
+                name: record.name,
+                description: record.description || record.name,
+                availability: record.stock > 0 ? "in stock" : "out of stock",
+                condition: "new",
+                price: (Math.round(record.price * 100)).toString(),
+                currency: "COP",
+                image_url: imageUrl,  // Cada variante tiene su propia imagen
+                url: `${SITE}/producto/${record.id}`,
+                brand: record.brand || "Generico",
+                product_type: categoryName,
+                color: `Opción ${index + 1}`,  // Selector visual de miniaturas
+            };
+
+            // Agregar precio con descuento si existe
+            if (hasDiscount) {
+                variantData.sale_price = (Math.round(record.offer_price * 100)).toString();
+            }
+
+            return {
+                method: "UPDATE",
+                retailer_id: `${record.id}_v${index + 1}`,  // ID único por variante
+                data: variantData
+            };
+        });
+
+        console.log(`📋 Creando ${batchRequests.length} variantes para item_group_id: ${record.id}`);
+        console.log(`📋 Batch Requests:`, JSON.stringify(batchRequests, null, 2));
 
         const res = await fetch(
             `https://graph.facebook.com/v21.0/${CATALOG}/batch`,
@@ -138,7 +164,7 @@ serve(async (req) => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    requests: [batchRequest]
+                    requests: batchRequests
                 }),
             }
         );
