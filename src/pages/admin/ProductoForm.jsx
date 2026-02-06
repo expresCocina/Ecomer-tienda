@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Upload, X, Package, DollarSign, Image as ImageIcon, Settings, Watch } from 'lucide-react';
+import { ArrowLeft, Upload, X, Package, DollarSign, Image as ImageIcon, Settings, Watch, Tag } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Card, CardHeader, CardBody } from '../../components/ui/Card';
 import { VariantEditor } from '../../components/admin/VariantEditor';
+import { CatalogMetadataEditor } from '../../components/admin/CatalogMetadataEditor';
+import { VariantCombinationTable } from '../../components/admin/VariantCombinationTable';
 import { supabase, uploadProductImage, getProductById } from '../../lib/supabase';
 
 /**
@@ -30,10 +32,18 @@ export const ProductoForm = () => {
         is_offer: false,
         show_in_carousel: false,
         tags: '',
+        // Metadatos de catálogo
+        google_product_category: '',
+        gender: '',
+        age_group: '',
+        condition: 'new',
+        brand: '',
+        material: '',
     });
     const [images, setImages] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
     const [variants, setVariants] = useState({});
+    const [variantCombinations, setVariantCombinations] = useState([]);
     const [errors, setErrors] = useState({});
 
     // Cargar categorías y producto si es edición
@@ -67,9 +77,35 @@ export const ProductoForm = () => {
                 is_offer: product.is_offer,
                 show_in_carousel: product.show_in_carousel || false,
                 tags: product.tags?.join(', ') || '',
+                // Metadatos de catálogo
+                google_product_category: product.google_product_category || '',
+                gender: product.gender || '',
+                age_group: product.age_group || '',
+                condition: product.condition || 'new',
+                brand: product.brand || '',
+                material: product.material || '',
             });
             setExistingImages(product.images || []);
-            setVariants(product.variants || {});
+
+            // Cargar variantes: si es array, es el nuevo formato, si es objeto, es el viejo
+            if (Array.isArray(product.variants)) {
+                setVariantCombinations(product.variants);
+                // Reconstruir variantTypes desde las combinaciones
+                const types = {};
+                product.variants.forEach(v => {
+                    Object.keys(v).forEach(key => {
+                        if (['colors', 'sizes', 'materials', 'styles'].includes(key) && v[key]) {
+                            if (!types[key]) types[key] = [];
+                            if (!types[key].includes(v[key])) {
+                                types[key].push(v[key]);
+                            }
+                        }
+                    });
+                });
+                setVariants(types);
+            } else {
+                setVariants(product.variants || {});
+            }
         } catch (error) {
             console.error('Error loading product:', error);
             alert('Error al cargar el producto');
@@ -103,9 +139,28 @@ export const ProductoForm = () => {
 
     const validate = () => {
         const newErrors = {};
+
+        // Validaciones básicas
         if (!formData.name) newErrors.name = 'Nombre es requerido';
         if (!formData.price || formData.price <= 0) newErrors.price = 'Precio debe ser mayor a 0';
         if (!formData.stock || formData.stock < 0) newErrors.stock = 'Stock debe ser mayor o igual a 0';
+
+        // Validación de marca (obligatorio para Facebook)
+        if (!formData.brand || formData.brand.trim() === '') {
+            newErrors.brand = 'Marca es obligatoria para sincronización con Facebook';
+        }
+
+        // Validación de variantes
+        if (variantCombinations.length > 0) {
+            const invalidVariants = variantCombinations.filter(v =>
+                !v.price || parseFloat(v.price) <= 0 || v.stock === undefined || parseInt(v.stock) < 0
+            );
+
+            if (invalidVariants.length > 0) {
+                newErrors.variants = `${invalidVariants.length} variante(s) tienen precio o stock inválido. Todas las variantes deben tener precio > 0 y stock >= 0.`;
+            }
+        }
+
         return newErrors;
     };
 
@@ -131,7 +186,7 @@ export const ProductoForm = () => {
             // Combinar imágenes existentes con nuevas
             const allImages = [...existingImages, ...uploadedImageUrls];
 
-            // Preparar datos
+            // Preparar datos limpios
             const productData = {
                 name: formData.name,
                 description: formData.description,
@@ -145,7 +200,29 @@ export const ProductoForm = () => {
                 show_in_carousel: formData.show_in_carousel,
                 tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
                 images: allImages,
-                variants: variants, // Agregar variantes
+
+                // Metadatos de catálogo (datos limpios)
+                google_product_category: formData.google_product_category || null,
+                gender: formData.gender || null,
+                age_group: formData.age_group || null,
+                condition: formData.condition || 'new',
+                brand: formData.brand || null,
+                material: formData.material || null,
+
+                // Variantes (JSONB limpio)
+                variants: variantCombinations.length > 0 ? variantCombinations.map(v => ({
+                    id: v.id,
+                    sku: v.sku || null,
+                    name: v.name,
+                    price: parseFloat(v.price),
+                    offer_price: v.offer_price ? parseFloat(v.offer_price) : null,
+                    stock: parseInt(v.stock),
+                    image_url: v.image_url || null,
+                    color: v.colors || null,
+                    size: v.sizes || null,
+                    material: v.materials || null,
+                    style: v.styles || null
+                })) : null,
             };
 
             let savedProductId = id;
@@ -422,6 +499,50 @@ export const ProductoForm = () => {
                                     variants={variants}
                                     onChange={setVariants}
                                 />
+
+                                {/* Tabla de combinaciones */}
+                                {Object.keys(variants).length > 0 && (
+                                    <VariantCombinationTable
+                                        variantTypes={variants}
+                                        combinations={variantCombinations}
+                                        onChange={setVariantCombinations}
+                                        productBrand={formData.brand}
+                                    />
+                                )}
+                            </CardBody>
+                        </Card>
+
+                        {/* Metadatos de Catálogo */}
+                        <Card>
+                            <CardHeader>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                        <Tag className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-semibold text-gray-900">Configuración de Canales (Meta/Google)</h2>
+                                        <p className="text-sm text-gray-500">Metadatos para Facebook y Google Shopping</p>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardBody>
+                                <CatalogMetadataEditor
+                                    metadata={{
+                                        google_product_category: formData.google_product_category,
+                                        gender: formData.gender,
+                                        age_group: formData.age_group,
+                                        condition: formData.condition,
+                                        brand: formData.brand,
+                                        material: formData.material
+                                    }}
+                                    onChange={(metadata) => setFormData({ ...formData, ...metadata })}
+                                />
+                                {errors.brand && (
+                                    <p className="text-sm text-red-500 mt-2">{errors.brand}</p>
+                                )}
+                                {errors.variants && (
+                                    <p className="text-sm text-red-500 mt-2">{errors.variants}</p>
+                                )}
                             </CardBody>
                         </Card>
 

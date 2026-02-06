@@ -76,7 +76,7 @@ serve(async (req) => {
         console.log(`🖼️ Imagen principal: ${mainImage.substring(0, 60)}...`);
         if (additionalImages.length > 0) {
             console.log(`📸 Imágenes adicionales: ${additionalImages.length}`);
-            additionalImages.forEach((img, i) => {
+            additionalImages.forEach((img: string, i: number) => {
                 console.log(`  ${i + 1}. ${img.substring(0, 60)}...`);
             });
         }
@@ -86,12 +86,12 @@ serve(async (req) => {
         const finalPrice = record.offer_price || record.price;
         const hasDiscount = record.offer_price && record.offer_price < record.price;
 
-        // Objeto data para Batch API (SIN retailer_id, SIN google_product_category)
+        // Objeto data para Batch API
         const data: any = {
             name: record.name,
             description: record.description || record.name,
             availability: record.stock > 0 ? "in stock" : "out of stock",
-            condition: "new",
+            condition: record.condition || "new",  // Usar condición de BD
             price: (Math.round(record.price * 100)).toString(),
             currency: "COP",
             image_url: mainImage,
@@ -99,6 +99,20 @@ serve(async (req) => {
             brand: record.brand || "Generico",
             product_type: categoryName,  // Necesario para reglas dinámicas de Facebook
         };
+
+        // Agregar metadatos opcionales de catálogo
+        if (record.google_product_category) {
+            data.google_product_category = record.google_product_category;
+        }
+        if (record.gender) {
+            data.gender = record.gender;
+        }
+        if (record.age_group) {
+            data.age_group = record.age_group;
+        }
+        if (record.material) {
+            data.material = record.material;
+        }
 
         // Agregar precio con descuento si existe (SIN sale_price_effective_date)
         if (hasDiscount) {
@@ -135,23 +149,34 @@ serve(async (req) => {
                 const variantAvailability = (variant.stock || record.stock || 0) > 0 ? "in stock" : "out of stock";
 
                 const variantData: any = {
-                    name: `${record.name} - ${variant.name || variant.value || `Variante ${index + 1}`}`,
+                    name: `${record.name} - ${variant.name || `Variante ${index + 1}`}`,
                     description: record.description || record.name,
                     availability: variantAvailability,
-                    condition: "new",
+                    condition: record.condition || "new",  // Usar condición del producto
                     price: Math.round(variantPrice * 100),
                     currency: "COP",
-                    image_url: variant.image || allImages[index] || mainImage,
+                    image_url: variant.image_url || allImages[index] || mainImage,
                     url: `${SITE}/producto/${record.id}`,
                     brand: record.brand || "Generico",
                     product_type: categoryName,
                 };
 
-                // Atributos diferenciadores (solo los que NO son prohibidos)
+                // Agregar metadatos de catálogo del producto
+                if (record.google_product_category) {
+                    variantData.google_product_category = record.google_product_category;
+                }
+                if (record.gender) {
+                    variantData.gender = record.gender;
+                }
+                if (record.age_group) {
+                    variantData.age_group = record.age_group;
+                }
+
+                // Atributos diferenciadores de la variante
                 if (variant.color) variantData.color = variant.color;
                 if (variant.size) variantData.size = variant.size;
                 if (variant.material) variantData.material = variant.material;
-                // style va en la raíz, NO aquí
+                // style va en la raíz, NO en data
 
                 // Precio con descuento
                 const variantDiscount = variant.offer_price && variant.offer_price < variantPrice;
@@ -165,7 +190,7 @@ serve(async (req) => {
                     method: "UPDATE",
                     retailer_id: variantId,
                     item_group_id: record.id,
-                    style: variant.style || undefined,  // style en la raíz
+                    style: variant.style || undefined,  // style en la raíz para diferenciación
                     data: variantData
                 };
             });
