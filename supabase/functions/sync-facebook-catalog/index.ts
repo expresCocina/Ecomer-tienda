@@ -120,37 +120,81 @@ serve(async (req) => {
 
         console.log(`📦 Sincronizando producto con Facebook usando Modelo Parent-Child...`);
 
-        // MODELO PARENT-CHILD: Crear una variante por cada imagen
-        // Todas las variantes comparten el mismo item_group_id (ID del producto)
-        // Cada variante tiene un retailer_id único: ID_v1, ID_v2, etc.
+        // SISTEMA HÍBRIDO: Detectar si hay variantes reales o usar imágenes
+        const hasRealVariants = record.variants && Array.isArray(record.variants) && record.variants.length > 0;
 
-        const batchRequests = allImages.map((imageUrl: string, index: number) => {
-            const variantData: any = {
-                item_group_id: record.id,  // El "pegamento" que une todas las variantes
-                name: record.name,
-                description: record.description || record.name,
-                availability: record.stock > 0 ? "in stock" : "out of stock",
-                condition: "new",
-                price: (Math.round(record.price * 100)).toString(),
-                currency: "COP",
-                image_url: imageUrl,  // Cada variante tiene su propia imagen
-                url: `${SITE}/producto/${record.id}`,
-                brand: record.brand || "Generico",
-                product_type: categoryName,
-                color: `Opción ${index + 1}`,  // Selector visual de miniaturas
-            };
+        let batchRequests;
 
-            // Agregar precio con descuento si existe
-            if (hasDiscount) {
-                variantData.sale_price = (Math.round(record.offer_price * 100)).toString();
-            }
+        if (hasRealVariants) {
+            // VARIANTES REALES: Usar datos de la base de datos
+            console.log(`✅ Producto con ${record.variants.length} variantes reales`);
 
-            return {
-                method: "UPDATE",
-                retailer_id: `${record.id}_v${index + 1}`,  // ID único por variante
-                data: variantData
-            };
-        });
+            batchRequests = record.variants.map((variant: any, index: number) => {
+                const variantData: any = {
+                    name: `${record.name} - ${variant.name || variant.value || `Variante ${index + 1}`}`,
+                    description: record.description || record.name,
+                    availability: (variant.stock || record.stock || 0) > 0 ? "in stock" : "out of stock",
+                    condition: "new",
+                    price: (Math.round((variant.price || record.price) * 100)).toString(),
+                    currency: "COP",
+                    image_url: variant.image || allImages[index] || mainImage,
+                    url: `${SITE}/producto/${record.id}`,
+                    brand: record.brand || "Generico",
+                    product_type: categoryName,
+                };
+
+                // Mapear atributos dinámicos
+                if (variant.color) variantData.color = variant.color;
+                if (variant.size) variantData.size = variant.size;
+                if (variant.material) variantData.material = variant.material;
+                if (variant.style) variantData.style = variant.style;
+
+                // Precio con descuento
+                const variantDiscount = variant.offer_price && variant.offer_price < (variant.price || record.price);
+                if (variantDiscount) {
+                    variantData.sale_price = (Math.round(variant.offer_price * 100)).toString();
+                } else if (hasDiscount) {
+                    variantData.sale_price = (Math.round(record.offer_price * 100)).toString();
+                }
+
+                return {
+                    method: "UPDATE",
+                    retailer_id: variant.id || `${record.id}_v${index + 1}`,
+                    item_group_id: record.id,
+                    data: variantData
+                };
+            });
+        } else {
+            // VARIANTES POR IMAGEN: Modelo actual (fallback)
+            console.log(`📸 Sin variantes reales, creando ${allImages.length} variantes por imagen`);
+
+            batchRequests = allImages.map((imageUrl: string, index: number) => {
+                const variantData: any = {
+                    name: record.name,
+                    description: record.description || record.name,
+                    availability: record.stock > 0 ? "in stock" : "out of stock",
+                    condition: "new",
+                    price: (Math.round(record.price * 100)).toString(),
+                    currency: "COP",
+                    image_url: imageUrl,
+                    url: `${SITE}/producto/${record.id}`,
+                    brand: record.brand || "Generico",
+                    product_type: categoryName,
+                    color: `Opción ${index + 1}`,
+                };
+
+                if (hasDiscount) {
+                    variantData.sale_price = (Math.round(record.offer_price * 100)).toString();
+                }
+
+                return {
+                    method: "UPDATE",
+                    retailer_id: `${record.id}_v${index + 1}`,
+                    item_group_id: record.id,
+                    data: variantData
+                };
+            });
+        }
 
         console.log(`📋 Creando ${batchRequests.length} variantes para item_group_id: ${record.id}`);
         console.log(`📋 Batch Requests:`, JSON.stringify(batchRequests, null, 2));
