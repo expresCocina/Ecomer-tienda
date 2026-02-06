@@ -74,13 +74,17 @@ serve(async (req) => {
         }
 
         // Preparar datos para Facebook
+        // IMPORTANTE: Facebook requiere price (precio original) y sale_price (precio con descuento)
+        const finalPrice = record.offer_price || record.price;
+        const hasDiscount = record.offer_price && record.offer_price < record.price;
+
         const data: any = {
             retailer_id: record.id,
             name: record.name,
             description: record.description || record.name,
             availability: record.stock > 0 ? "in stock" : "out of stock",
             condition: "new",
-            price: (Math.round(record.price * 100)).toString(),
+            price: (Math.round(record.price * 100)).toString(), // Precio ORIGINAL (siempre)
             currency: "COP",
             image_url: mainImage,
             url: `${SITE}/producto/${record.id}`,
@@ -89,38 +93,61 @@ serve(async (req) => {
             google_product_category: categoryName,
         };
 
-        // Agregar imágenes adicionales si existen
-        if (additionalImages.length > 0) {
-            data.additional_image_urls = additionalImages;
+        // Agregar precio con descuento si existe
+        if (hasDiscount) {
+            data.sale_price = (Math.round(record.offer_price * 100)).toString();
+            // Fecha efectiva del descuento (permanente por ahora)
+            data.sale_price_effective_date = `${new Date().toISOString().split('T')[0]}/${new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}`;
+            console.log(`💰 Precio original: $${record.price.toLocaleString()} → Descuento: $${record.offer_price.toLocaleString()}`);
+        } else {
+            console.log(`💰 Precio: $${record.price.toLocaleString()}`);
         }
+
+        // Agregar imágenes adicionales si existen
+        // Facebook puede usar additional_image_link O additional_image_urls dependiendo del endpoint
+        // Probamos ambos para máxima compatibilidad
+        if (additionalImages.length > 0) {
+            data.additional_image_link = additionalImages;  // Formato para feeds
+            console.log(`🖼️ Campo additional_image_link configurado con ${additionalImages.length} URLs`);
+        }
+
+        // Log del payload completo para debugging
+        console.log(`📋 PAYLOAD COMPLETO:`, JSON.stringify(data, null, 2));
 
         console.log(`📦 Sincronizando producto con Facebook...`);
 
-        // Verificar si el producto ya existe en Facebook
-        let productExists = false;
-        if (record.facebook_product_id) {
-            console.log(`🔍 Verificando si producto existe en Facebook (ID: ${record.facebook_product_id})...`);
-            const checkRes = await fetch(
-                `https://graph.facebook.com/v21.0/${record.facebook_product_id}`,
-                {
-                    headers: { "Authorization": "Bearer " + TOKEN }
-                }
-            );
-            productExists = checkRes.ok;
-            console.log(productExists ? `✅ Producto existe, actualizando...` : `⚠️ Producto no existe, creando nuevo...`);
-        } else {
-            console.log(`⚠️ Sin facebook_product_id, creando nuevo producto...`);
-        }
+        // Estrategia: LIMPIAR IMÁGENES + ACTUALIZAR
+        // Esta estrategia PRESERVA el ID del producto (no rompe anuncios)
+        // 1. Si el producto existe, primero limpiamos las imágenes adicionales
+        // 2. Luego actualizamos con todos los datos incluyendo las imágenes correctas
 
-        // Preparar datos para enviar
         let res;
+        let fb;
 
-        if (productExists) {
-            console.log(`🔄 Actualizando producto DIRECTAMENTE por ID: ${record.facebook_product_id}...`);
-            // Imprimir payload para debug
-            console.log("Payload Update:", JSON.stringify(data));
+        if (record.facebook_product_id) {
+            console.log(`🧹 Limpiando imágenes adicionales del producto (ID: ${record.facebook_product_id})...`);
 
-            // Actualización directa al nodo del producto
+            // Paso 1: Limpiar imágenes adicionales enviando array vacío
+            try {
+                const cleanRes = await fetch(
+                    `https://graph.facebook.com/v21.0/${record.facebook_product_id}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Authorization": "Bearer " + TOKEN,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ additional_image_link: [] })
+                    }
+                );
+                const cleanResult = await cleanRes.json();
+                console.log(cleanRes.ok ? `✅ Imágenes adicionales limpiadas` : `⚠️ Limpieza: ${JSON.stringify(cleanResult)}`);
+            } catch (cleanErr) {
+                console.log(`⚠️ Error al limpiar imágenes (continuando): ${cleanErr}`);
+            }
+
+            // Paso 2: Actualizar producto con todos los datos (incluyendo imágenes nuevas)
+            console.log(`🔄 Actualizando producto existente...`);
             res = await fetch(
                 `https://graph.facebook.com/v21.0/${record.facebook_product_id}`,
                 {
@@ -129,12 +156,13 @@ serve(async (req) => {
                         "Authorization": "Bearer " + TOKEN,
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(data), // No necesitamos method: UPDATE aquí, ni retailer_id (ya lo tiene)
+                    body: JSON.stringify(data),
                 }
             );
+            fb = await res.json();
         } else {
-            console.log(`✨ Creando producto NUEVO en catálogo...`);
-            // Creación en el catálogo
+            // Producto nuevo: crear en el catálogo
+            console.log(`✨ Creando producto nuevo en Facebook...`);
             res = await fetch(
                 `https://graph.facebook.com/v21.0/${CATALOG}/products`,
                 {
@@ -146,9 +174,10 @@ serve(async (req) => {
                     body: JSON.stringify(data),
                 }
             );
+            fb = await res.json();
         }
 
-        const fb = await res.json();
+
 
         if (!res.ok) {
             console.error("❌ Error en Facebook API:", fb);
