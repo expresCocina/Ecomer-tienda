@@ -3,8 +3,112 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.94.0";
 
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Headers":
+        "authorization, x-client-info, apikey, content-type",
 };
+
+type Variant = {
+    id?: string;
+    sku?: string;
+    name?: string;
+    price?: number;
+    offer_price?: number;
+    stock?: number;
+    image_url?: string;
+    color?: string;
+    size?: string;
+    material?: string;
+    style?: string;
+};
+
+type ProductRecord = {
+    id: string;
+    name: string;
+    description?: string;
+    price: number;
+    offer_price?: number;
+    stock?: number;
+    condition?: string;
+    brand?: string;
+    category_id?: string;
+    images?: string[];
+    variants?: Variant[];
+
+    google_product_category?: string;
+    gender?: string;
+    age_group?: string;
+    material?: string;
+    custom_label_0?: string;
+};
+
+function toCents(value: number): number {
+    return Math.round(value * 100);
+}
+
+function safeString(x: unknown, fallback = ""): string {
+    return typeof x === "string" && x.trim() ? x.trim() : fallback;
+}
+
+function isValidHttpsUrl(u: string): boolean {
+    return typeof u === "string" && u.startsWith("https://");
+}
+
+function isBlobUrl(u: string): boolean {
+    return typeof u === "string" && u.startsWith("blob:");
+}
+
+/**
+ * Convierte:
+ * - https://... => ok
+ * - http://... => inválida (Meta pide https) => ""
+ * - /storage/... => SUPABASE_URL + /storage/...
+ * - bucket/path => SUPABASE_URL/storage/v1/object/public/bucket/path
+ * - blob:... => inválida => ""
+ */
+function normalizeImageUrl(raw: string, supabaseUrl: string): string {
+    const u = safeString(raw, "");
+    if (!u) return "";
+
+    if (isBlobUrl(u)) return "";
+    if (u.startsWith("https://")) return u;
+    if (u.startsWith("http://")) return ""; // Meta suele exigir https
+
+    if (u.startsWith("/storage/")) return `${supabaseUrl}${u}`;
+    return `${supabaseUrl}/storage/v1/object/public/${u}`;
+}
+
+/**
+ * Decide si las variantes son "reales" para enviar modelo Shopify:
+ * - Deben existir
+ * - Deben tener al menos (id/sku/color/name) útil
+ */
+function hasRealVariants(variants?: Variant[]): boolean {
+    if (!Array.isArray(variants) || variants.length === 0) return false;
+
+    // Si todas vienen vacías o sin atributos, no sirven
+    const useful = variants.some((v) =>
+        Boolean(
+            safeString(v.id) ||
+            safeString(v.sku) ||
+            safeString(v.color) ||
+            safeString(v.name),
+        )
+    );
+
+    return useful;
+}
+
+/**
+ * Orden estable de variantes (para mapear imágenes por índice):
+ * sku => id => name
+ */
+function sortVariantsStable(variants: Variant[]): Variant[] {
+    return [...variants].sort((a, b) => {
+        const ak = safeString(a.sku) || safeString(a.id) || safeString(a.name);
+        const bk = safeString(b.sku) || safeString(b.id) || safeString(b.name);
+        return ak.localeCompare(bk);
+    });
+}
 
 serve(async (req) => {
     if (req.method === "OPTIONS") {
@@ -16,336 +120,256 @@ serve(async (req) => {
         const CATALOG = Deno.env.get("FACEBOOK_CATALOG_ID");
         const SITE = Deno.env.get("SITE_URL") || "https://cycrelojeria.com";
         const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-        const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("DB_SERVICE_KEY");
+        const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("DB_SERVICE_KEY"); // tu secreto
 
         if (!TOKEN || !CATALOG || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-            throw new Error("Missing secrets (TOKEN, CATALOG, URL, SERVICE_KEY)");
+            throw new Error(
+                "Missing secrets (FACEBOOK_ACCESS_TOKEN, FACEBOOK_CATALOG_ID, SUPABASE_URL, DB_SERVICE_KEY)",
+            );
         }
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-        const payload = await req.json();
-        const record = payload.record;
+        // Payload soporta record/new/data.record/data.new
+        const payload = await req.json().catch(() => ({}));
+        const record: ProductRecord | undefined =
+            payload?.record ?? payload?.new ?? payload?.data?.record ?? payload?.data?.new;
 
-        if (!record) {
-            throw new Error("No 'record' found in payload");
+        if (!record || !record.id || !record.name) {
+            throw new Error("No valid product 'record' found in payload");
         }
 
         console.log(`🔄 Sincronizando producto: ${record.name} (${record.id})`);
 
-        // Obtener nombre de categoría
+        // categoría (opcional)
         let categoryName = "Sin categoría";
         if (record.category_id) {
-            console.log(`🔍 Buscando categoría con ID: ${record.category_id}`);
-            const { data: category, error: categoryError } = await supabase
+            const { data: category, error } = await supabase
                 .from("categories")
                 .select("name")
                 .eq("id", record.category_id)
                 .single();
 
-            if (categoryError) {
-                console.error(`❌ Error al obtener categoría:`, categoryError);
-            } else if (category) {
-                categoryName = category.name;
-                console.log(`✅ Categoría encontrada: ${categoryName}`);
-            } else {
-                console.log(`⚠️ Categoría no encontrada para ID: ${record.category_id}`);
-            }
-        } else {
-            console.log(`⚠️ Producto sin category_id asignado`);
+            if (!error && category?.name) categoryName = category.name;
         }
-
         console.log(`📁 Categoría final: ${categoryName}`);
 
-        // Helper: Asegurar que las URLs sean absolutas con HTTPS
-        const ensureAbsoluteUrl = (url: string): string => {
-            if (!url) return "";
+        // Normalizar imágenes del producto (record.images)
+        const rawImages = (record.images ?? []).filter((x) => typeof x === "string");
 
-            // Si ya es una URL absoluta, retornarla
-            if (url.startsWith("http://") || url.startsWith("https://")) {
-                return url;
-            }
+        const allImages = rawImages
+            .map((u) => normalizeImageUrl(u, SUPABASE_URL))
+            .filter((u) => isValidHttpsUrl(u))
+            .filter((u, idx, self) => self.indexOf(u) === idx);
 
-            // Si es una ruta de Supabase Storage, construir URL completa
-            // Formato esperado: /storage/v1/object/public/...
-            if (url.startsWith("/storage/")) {
-                return `${SUPABASE_URL}${url}`;
-            }
-
-            // Si es solo el path del bucket, construir URL completa
-            // Formato: product-images/abc123.jpg
-            return `${SUPABASE_URL}/storage/v1/object/public/${url}`;
-        };
-
-        // Filtrar, limpiar y validar imágenes
-        const allImages = (record.images || [])
-            .filter((url: string) => url && url.trim() !== "")
-            .map((url: string) => ensureAbsoluteUrl(url))
-            .filter((url: string) => url.startsWith("https://")) // Solo HTTPS válidas
-            .filter((url: string, index: number, self: string[]) => self.indexOf(url) === index);
-
-        console.log(`📸 Total de imágenes únicas: ${allImages.length}`);
+        console.log(`📸 Total de imágenes únicas HTTPS (record.images): ${allImages.length}`);
 
         if (allImages.length === 0) {
-            throw new Error("Producto sin imágenes válidas");
+            throw new Error("Producto sin imágenes HTTPS válidas en record.images");
         }
 
-        // Primera imagen como principal
         const mainImage = allImages[0];
-        // Resto de imágenes como adicionales (máximo 20 según Facebook)
         const additionalImages = allImages.slice(1, 20);
 
-        console.log(`🖼️ Imagen principal: ${mainImage.substring(0, 60)}...`);
-        if (additionalImages.length > 0) {
-            console.log(`📸 Imágenes adicionales: ${additionalImages.length}`);
-            additionalImages.forEach((img: string, i: number) => {
-                console.log(`  ${i + 1}. ${img.substring(0, 60)}...`);
-            });
-        }
+        const baseUrl = `${SITE}/producto/${record.id}`;
+        const baseCondition = safeString(record.condition, "new");
+        const baseBrand = safeString(record.brand, "Generico");
 
-        // Preparar datos para Facebook
-        // IMPORTANTE: Facebook requiere price (precio original) y sale_price (precio con descuento)
-        const finalPrice = record.offer_price || record.price;
-        const hasDiscount = record.offer_price && record.offer_price < record.price;
+        // Base data para Meta
+        const makeBaseData = () => {
+            const data: Record<string, unknown> = {
+                name: record.name,
+                description: safeString(record.description, record.name),
+                condition: baseCondition,
+                currency: "COP",
+                url: baseUrl,
+                brand: baseBrand,
+                product_type: categoryName,
+            };
 
-        // Objeto data para Batch API
-        const data: any = {
-            name: record.name,
-            description: record.description || record.name,
-            availability: record.stock > 0 ? "in stock" : "out of stock",
-            condition: record.condition || "new",  // Usar condición de BD
-            price: (Math.round(record.price * 100)).toString(),
-            currency: "COP",
-            image_url: mainImage,
-            url: `${SITE}/producto/${record.id}`,
-            brand: record.brand || "Generico",
-            product_type: categoryName,  // Necesario para reglas dinámicas de Facebook
+            if (record.google_product_category) data.category = String(record.google_product_category);
+            if (record.gender) data.gender = record.gender;
+            if (record.age_group) data.age_group = record.age_group;
+            if (record.age_group) data.age_group = record.age_group;
+            if (record.material) data.material = record.material;
+            // Colecciones Automáticas (Shopify style)
+            if (record.custom_label_0) data.custom_label_0 = record.custom_label_0;
+
+            return data;
         };
 
-        // Agregar metadatos opcionales de catálogo
-        if (record.google_product_category) {
-            data.google_product_category = record.google_product_category;
-        }
-        if (record.gender) {
-            data.gender = record.gender;
-        }
-        if (record.age_group) {
-            data.age_group = record.age_group;
-        }
-        if (record.material) {
-            data.material = record.material;
-        }
+        // --- MODO SHOPIFY: SIEMPRE ENVIAR PRODUCTO PADRE ---
+        const variantsAreReal = hasRealVariants(record.variants);
+        const requests: Array<Record<string, unknown>> = [];
 
-        // Agregar precio con descuento si existe (SIN sale_price_effective_date)
-        if (hasDiscount) {
-            data.sale_price = (Math.round(record.offer_price * 100)).toString();
-            console.log(`💰 Precio original: $${record.price.toLocaleString()} → Descuento: $${record.offer_price.toLocaleString()}`);
-        } else {
-            console.log(`💰 Precio: $${record.price.toLocaleString()}`);
-        }
+        // 🔴 CRÍTICO: SIEMPRE crear producto padre primero
+        console.log(`🏗️  Creando producto PADRE con retailer_id = ${record.id}`);
 
-        // Agregar imágenes adicionales si existen
-        // Batch API requiere additional_image_urls (plural)
+        const parentStock = record.stock ?? 0;
+        const parentAvailability = parentStock > 0 ? "in stock" : "out of stock";
+
+        const parentData = makeBaseData();
+        parentData.id = String(record.id);  // ID del producto padre
+        parentData.item_group_id = String(record.id);  // Se agrupa consigo mismo
+        parentData.image_url = mainImage;
+        parentData.price = toCents(record.price);
+        parentData.availability = parentAvailability;
+
+        // Agregar imágenes adicionales para galería
         if (additionalImages.length > 0) {
-            data.additional_image_urls = additionalImages;
-            console.log(`🖼️ Campo additional_image_urls configurado con ${additionalImages.length} URLs`);
+            parentData.additional_image_urls = additionalImages;
         }
 
-        // Log del payload completo para debugging
-        console.log(`📋 PAYLOAD COMPLETO:`, JSON.stringify(data, null, 2));
-
-        console.log(`📦 Sincronizando producto con Facebook usando Modelo Parent-Child...`);
-
-        // SISTEMA HÍBRIDO: Detectar si hay variantes reales o usar imágenes
-        const hasRealVariants = record.variants && Array.isArray(record.variants) && record.variants.length > 0;
-
-        let batchRequests;
-
-        if (hasRealVariants) {
-            // VARIANTES REALES: Usar datos de la base de datos
-            console.log(`✅ Producto con ${record.variants.length} variantes reales`);
-
-            batchRequests = record.variants.map((variant: any, index: number) => {
-                // CRÍTICO: Usar ID único real, no genérico
-                const variantId = variant.id || `${record.id}_var_${index + 1}_${Date.now()}`;
-                const variantPrice = variant.price || record.price;
-                const variantStock = variant.stock !== undefined ? variant.stock : record.stock;
-                const variantAvailability = (variantStock || 0) > 0 ? "in stock" : "out of stock";
-
-                // Asegurar que la imagen de la variante sea URL absoluta
-                let variantImageUrl = variant.image_url || allImages[index] || mainImage;
-                variantImageUrl = ensureAbsoluteUrl(variantImageUrl);
-
-                const variantData: any = {
-                    id: variantId,  // ✅ DEBE SER IDÉNTICO AL retailer_id
-                    item_group_id: record.id,  // ✅ TAMBIÉN EN DATA
-                    name: `${record.name} - ${variant.name || `Variante ${index + 1}`}`,
-                    description: record.description || record.name,
-                    condition: record.condition || "new",
-                    price: Math.round(variantPrice * 100),
-                    currency: "COP",
-                    image_url: variantImageUrl,
-                    url: `${SITE}/producto/${record.id}`,
-                    brand: record.brand || "Generico",
-                    product_type: categoryName
-                };
-
-                // Agregar metadatos de catálogo opcionales
-                if (record.gender) {
-                    variantData.gender = record.gender;
-                }
-                if (record.age_group) {
-                    variantData.age_group = record.age_group;
-                }
-
-                // ✅ DIFERENCIADORES OBLIGATORIOS - Facebook necesita al menos uno para agrupar
-                if (variant.color) {
-                    variantData.color = variant.color;
-                } else if (variant.name) {
-                    // Si no hay color, usar el nombre de la variante como diferenciador
-                    variantData.color = variant.name;
-                }
-
-                if (variant.size) variantData.size = variant.size;
-                if (variant.material) variantData.material = variant.material;
-
-                // Precio con descuento - SOLO si offer_price > 0
-                if (variant.offer_price && variant.offer_price > 0 && variant.offer_price < variantPrice) {
-                    variantData.sale_price = Math.round(variant.offer_price * 100);
-                } else if (record.offer_price && record.offer_price > 0 && record.offer_price < record.price) {
-                    variantData.sale_price = Math.round(record.offer_price * 100);
-                }
-
-                // Construir objeto de respuesta
-                const batchItem: any = {
-                    method: "UPDATE",
-                    retailer_id: variantId,  // ✅ IDÉNTICO A data.id
-                    item_group_id: record.id,
-                    availability: variantAvailability,
-                    inventory: variantStock || 0,  // ✅ AGREGAR STOCK NUMÉRICO EN RAÍZ
-                    google_product_category: record.google_product_category || '512',
-                    data: variantData
-                };
-
-                // ✅ SOLO agregar style si tiene valor real (no undefined)
-                if (variant.style && variant.style.trim() !== '') {
-                    batchItem.style = variant.style;
-                }
-
-                return batchItem;
-            });
-        } else {
-            // VARIANTES POR IMAGEN: Modelo actual (fallback)
-            console.log(`📸 Sin variantes reales, creando ${allImages.length} variantes por imagen`);
-
-            batchRequests = allImages.map((imageUrl: string, index: number) => {
-                // CRÍTICO: Usar ID único real
-                const variantId = `${record.id}_img_${index + 1}_${Date.now()}`;
-                const variantAvailability = record.stock > 0 ? "in stock" : "out of stock";
-
-                const variantData: any = {
-                    id: variantId,  // ✅ DEBE SER IDÉNTICO AL retailer_id
-                    item_group_id: record.id,  // ✅ TAMBIÉN EN DATA
-                    name: record.name,
-                    description: record.description || record.name,
-                    condition: record.condition || "new",
-                    price: Math.round(record.price * 100),
-                    currency: "COP",
-                    image_url: imageUrl,  // Ya viene validada como HTTPS absoluta
-                    url: `${SITE}/producto/${record.id}`,
-                    brand: record.brand || "Generico",
-                    product_type: categoryName,
-                    // ✅ DIFERENCIADOR: Usar el índice de vista como color para agrupar
-                    color: `Vista ${index + 1}`
-                };
-
-                // Agregar metadatos de catálogo opcionales
-                if (record.gender) {
-                    variantData.gender = record.gender;
-                }
-                if (record.age_group) {
-                    variantData.age_group = record.age_group;
-                }
-
-                // Precio con descuento - SOLO si offer_price > 0
-                if (record.offer_price && record.offer_price > 0 && record.offer_price < record.price) {
-                    variantData.sale_price = Math.round(record.offer_price * 100);
-                }
-
-                return {
-                    method: "UPDATE",
-                    retailer_id: variantId,  // ✅ IDÉNTICO A data.id
-                    item_group_id: record.id,
-                    availability: variantAvailability,
-                    inventory: record.stock || 0,  // ✅ AGREGAR STOCK NUMÉRICO EN RAÍZ
-                    google_product_category: record.google_product_category || '512',
-                    // ❌ NO agregar style aquí (no es necesario para variantes por imagen)
-                    data: variantData
-                };
-            });
+        // Sale price del padre
+        if (
+            typeof record.offer_price === "number" &&
+            record.offer_price > 0 &&
+            record.offer_price < record.price
+        ) {
+            parentData.sale_price = toCents(record.offer_price);
         }
 
-        console.log(`📋 Creando ${batchRequests.length} variantes para item_group_id: ${record.id}`);
-        console.log(`📋 Batch Requests:`, JSON.stringify(batchRequests, null, 2));
+        // 🔴 PRODUCTO PADRE (siempre se envía)
+        requests.push({
+            method: "UPDATE",
+            retailer_id: String(record.id),  // ✅ ID del producto (sin sufijos)
+            item_group_id: String(record.id),
+            availability: parentAvailability,
+            inventory: parentStock,
+            google_product_category: record.google_product_category || '512',
+            data: parentData
+        });
 
-        const res = await fetch(
-            `https://graph.facebook.com/v21.0/${CATALOG}/batch`,
-            {
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + TOKEN,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    requests: batchRequests
-                }),
+        console.log(`✅ Producto padre creado: ${record.id}`);
+
+        // 🟢 Si hay variantes REALES, crear variantes hijas
+        if (variantsAreReal) {
+            const variants = sortVariantsStable(record.variants!);
+            console.log(`🔗 Creando ${variants.length} variantes HIJAS vinculadas al padre`);
+
+            for (let i = 0; i < variants.length; i++) {
+                const v = variants[i];
+
+                const retailerId = safeString(v.id)
+                    ? String(v.id)
+                    : safeString(v.sku)
+                        ? `${record.id}_sku_${v.sku}`
+                        : `${record.id}_var_${i + 1}`;
+
+                const vPrice = typeof v.price === "number" ? v.price : record.price;
+                const vStock =
+                    typeof v.stock === "number" ? v.stock : (record.stock ?? 0);
+
+                const availability = vStock > 0 ? "in stock" : "out of stock";
+
+                // Imagen por variante:
+                // 1) si v.image_url es https => usarla
+                // 2) si v.image_url es blob o inválida => usar allImages[i] (por índice)
+                // 3) fallback a mainImage
+                let candidate = "";
+                const vImgNorm = normalizeImageUrl(safeString(v.image_url, ""), SUPABASE_URL);
+                if (isValidHttpsUrl(vImgNorm)) {
+                    candidate = vImgNorm;
+                } else {
+                    candidate = allImages[i] ?? mainImage;
+                }
+
+                const data = makeBaseData();
+
+                data.id = retailerId;  // ✅ ID de la variante
+                data.item_group_id = String(record.id);  // ✅ Referencia al padre
+                data.name = `${record.name} - ${safeString(v.name, `Variante ${i + 1}`)}`;
+                data.image_url = candidate;
+                data.price = toCents(vPrice);
+                data.availability = availability;
+
+                // 🔴 CRÍTICO: retailer_product_group_id vincula al padre
+                data.retailer_product_group_id = String(record.id);
+
+                // Diferenciadores (obligatorios para agrupar)
+                const color = safeString(v.color, safeString(v.name, `Variante ${i + 1}`));
+                data.color = color;
+                if (v.size) data.size = v.size;
+                if (v.material) data.material = v.material;
+
+                // Sale price
+                if (
+                    typeof v.offer_price === "number" &&
+                    v.offer_price > 0 &&
+                    v.offer_price < vPrice
+                ) {
+                    data.sale_price = toCents(v.offer_price);
+                } else if (
+                    typeof record.offer_price === "number" &&
+                    record.offer_price > 0 &&
+                    record.offer_price < vPrice
+                ) {
+                    data.sale_price = toCents(record.offer_price);
+                }
+
+                console.log(`  📸 Variante ${retailerId} -> ${candidate} (color: ${color})`);
+
+                // 🟢 VARIANTE HIJA
+                const variantRequest: Record<string, unknown> = {
+                    method: "UPDATE",
+                    retailer_id: retailerId,  // ✅ ID único de la variante
+                    item_group_id: String(record.id),  // ✅ Vinculada al padre
+                    availability: availability,
+                    inventory: vStock,
+                    google_product_category: record.google_product_category || '512',
+                    data: data
+                };
+
+                // Solo agregar style si tiene valor real
+                if (v.style && v.style.trim() !== '') {
+                    variantRequest.style = v.style;
+                }
+
+                requests.push(variantRequest);
             }
-        );
+        } else {
+            // ✅ Sin variantes: solo el producto padre (ya creado arriba)
+            console.log(`🧩 Producto sin variantes: solo padre con ${allImages.length} imágenes`);
+        }
 
-        const fb = await res.json();
+        console.log(`📋 Enviando ${requests.length} requests al catálogo ${CATALOG}`);
 
-        console.log(`📤 Respuesta de Facebook:`, JSON.stringify(fb, null, 2));
+        const res = await fetch(`https://graph.facebook.com/v21.0/${CATALOG}/batch`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${TOKEN}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                allow_upsert: true,
+                requests,
+            }),
+        });
 
+        const fb = await res.json().catch(() => ({}));
+        console.log(`📤 Respuesta Facebook:`, JSON.stringify(fb, null, 2));
 
         if (!res.ok) {
-            console.error("❌ Error en Facebook API:", fb);
             throw new Error(`Facebook Error: ${JSON.stringify(fb)}`);
         }
 
-        console.log("✅ Producto sincronizado exitosamente");
-        console.log(`   ID de Facebook: ${fb.id}`);
-        console.log(`   Imágenes totales: ${allImages.length} (1 principal + ${additionalImages.length} adicionales)`);
-
-        // Guardar facebook_product_id en la base de datos
-        // Esto es CRÍTICO para que el trigger de eliminación funcione
-        console.log(`💾 Guardando facebook_product_id en la base de datos...`);
-
-        const { error: updateError } = await supabase
-            .from("products")
-            .update({ facebook_product_id: fb.id })
-            .eq("id", record.id);
-
-        if (updateError) {
-            console.error("⚠️ Error guardando facebook_product_id:", updateError);
-            // No lanzamos error porque el producto ya se sincronizó exitosamente
-        } else {
-            console.log(`✅ facebook_product_id guardado: ${fb.id}`);
-        }
+        const handle = Array.isArray(fb?.handles) ? fb.handles[0] : null;
 
         return new Response(
             JSON.stringify({
                 success: true,
-                fb_id: fb.id,
-                images_count: allImages.length
+                mode: variantsAreReal ? "variants_shopify" : "single_with_images",
+                handle,
+                requests_sent: requests.length,
+                images_count: allImages.length,
             }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
-
     } catch (err) {
         console.error("❌ Error General:", err);
         return new Response(
-            JSON.stringify({ error: err.message }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            JSON.stringify({ success: false, error: err?.message ?? String(err) }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
     }
 });

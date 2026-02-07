@@ -39,6 +39,7 @@ export const ProductoForm = () => {
         condition: 'new',
         brand: '',
         material: '',
+        custom_label_0: '', // Etiqueta para colecciones automáticas
     });
     const [images, setImages] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
@@ -84,6 +85,8 @@ export const ProductoForm = () => {
                 condition: product.condition || 'new',
                 brand: product.brand || '',
                 material: product.material || '',
+                // Colecciones (Shopify style)
+                custom_label_0: product.custom_label_0 || '',
             });
             setExistingImages(product.images || []);
 
@@ -563,6 +566,19 @@ export const ProductoForm = () => {
                                     }}
                                     onChange={(metadata) => setFormData({ ...formData, ...metadata })}
                                 />
+
+                                <div className="mt-4 pt-4 border-t border-gray-100">
+                                    <h3 className="text-sm font-medium text-gray-700 mb-2">Colecciones Automáticas (Facebook/Instagram)</h3>
+                                    <Input
+                                        label="Etiqueta Personalizada (custom_label_0)"
+                                        name="custom_label_0"
+                                        placeholder="Ej: mas_vendidos, ofertas, navidad"
+                                        value={formData.custom_label_0}
+                                        onChange={handleChange}
+                                        helperText="Usa esto para crear conjuntos de productos automáticos en Facebook (letras minúsculas y guiones bajos recomendados)."
+                                    />
+                                </div>
+
                                 {errors.brand && (
                                     <p className="text-sm text-red-500 mt-2">{errors.brand}</p>
                                 )}
